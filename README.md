@@ -15,12 +15,11 @@ Test of logic and computational skills questions repository.
    - Five alternatives per question.
    - Any questions can be about more of one tested area.
    - The alternatives have not binary evaluation.
- - S2: Pratical Test with 4 code questions (1 hour)
+ - S2: Pratical Test with 3 code questions (1 hour)
    - Question in diversal languages.
    - Visual probelam representation.
    - Cover by hidden automated testes.
    - The third is a performance question.
-   - The fourth is a AI question.
    - Avaliated by test result;
  - S3: Git Merge Approve Test (45 hour)
    - A open problem, with many solutions and interpretations.
