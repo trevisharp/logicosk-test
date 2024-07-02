@@ -22,10 +22,9 @@ Test of logic and computational skills questions repository.
    - The third is a performance question.
    - The fourth is a AI question.
    - Avaliated by test result;
- - S3: Open Problem Solving (45 hour)
+ - S3: Git Merge Approve Test (45 hour)
    - A open problem, with many solutions and interpretations.
-   - All resources are allowed.
-   - Simple library and tool will be delivered.
+   - Choose between many solutions and order by quality.
  - S4: Pratical Bug Fix with 4 code questions (1 hour)
    - Levels easy to insane.
    - Visual probelam representation.
