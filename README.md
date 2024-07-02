@@ -16,7 +16,7 @@ Test of logic and computational skills questions repository.
 ### Test Structure
 
   - Ornganization and test presentation (15 minutes).
-  - Concept Test with 30 multiple choice questions (1 hour).
+  - Concept Test with 30 multiple choice questions (45 minutes).
     - Quenstions about the seven tested areas.
     - Five alternatives per question.
     - Any questions can be about more of one tested area.
@@ -26,14 +26,13 @@ Test of logic and computational skills questions repository.
     - Visual probelam representation.
     - Cover by hidden automated testes.
     - Avaliated by test result;
-  - Internval (30 minutes).
   - Ornganization and test presentation (15 minutes).
-  - Open Problem Solving (1 hour)
+  - Open Problem Solving (45 hour)
     - A open problem, with many solutions and interpretations.
     - All resources are allowed.
-    - Criteria:
-      - Usability:
-        - 0: Inevaluable.
-        - 1: Easy to understain and applicate.
-        - 2: Very easy to use. Easy installation. Well documented.
-      - 
+    - Simple library and tool will be delivered.
+  - Pratical Bug Fix with 4 code questions (1 hour)
+    - Levels easy to insane.
+    - Visual probelam representation.
+    - Cover by hidden automated testes.
+    - Avaliated by test result;
