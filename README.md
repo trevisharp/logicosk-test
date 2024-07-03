@@ -3,7 +3,7 @@ Test of logic and computational skills questions repository.
 
 ## Test Stages
 
- - S1: Concept Test with 30 multiple choice questions (45 minutes).
+ - S1: Concept Test with 30 multiple choice questions (1 hour).
    - Quenstions about the seven tested areas/aspects:
      - A1: Pure Logic and Math
      - A2: Low-Level Programming and Data Structures
@@ -21,10 +21,7 @@ Test of logic and computational skills questions repository.
    - Cover by hidden automated testes.
    - The third is a performance question.
    - Avaliated by test result;
- - S3: Git Merge Approve Test (45 hour)
-   - A open problem, with many solutions and interpretations.
-   - Choose between many solutions and order by quality.
- - S4: Pratical Bug Fix with 4 code questions (1 hour)
+ - S3: Pratical Bug Fix with 6 code questions (1 hour)
    - Levels easy to insane.
    - Visual probelam representation.
    - Cover by hidden automated testes.
@@ -33,7 +30,7 @@ Test of logic and computational skills questions repository.
 
 ## Grade
 
-Final grade = (A1 + A2 + A3 + A4) / 4 (Between 0 and 1000)
+Final grade = (A1 + A2 + A2) / 3 (Between 0 and 1000)
 
 ## Classification
   
