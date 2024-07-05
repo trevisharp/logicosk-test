@@ -4,12 +4,12 @@ using System.Collections.Generic;
 
 using Pamella;
 using Logicosk;
-using System.Data.Common;
-using System.ComponentModel.Design;
+using System.Threading.Tasks;
+using System.Threading;
 
-App.Open(new MainView());
+App.Open(new MainView("result.test"));
 
-class MainView : View
+class MainView(string path) : View
 {
     Test test = null;
     Dictionary<Question, Alternative> awnsers = new Dictionary<Question, Alternative>();
@@ -20,8 +20,12 @@ class MainView : View
     int jump = 80;
     int spacing = 60;
     DateTime escTime = DateTime.MaxValue;
-    protected override void OnStart(IGraphics g)
+    protected override async void OnStart(IGraphics g)
     {
+        new Thread(async () => {
+            test = await TestManager.Open(path);
+        }).Start();
+
         AlwaysInvalidateMode();
         g.SubscribeKeyDownEvent(key => {
             if (key == Input.Escape && escTime == DateTime.MaxValue)
@@ -102,9 +106,9 @@ class MainView : View
     protected override void OnRender(IGraphics g)
     {
         g.Clear(Color.SkyBlue);
-        if (this.test is null)
+        if (test is null)
             return;
-
+        
         var question = this.test.Questions[current];
         var font = new Font("Arial", 40);
 
@@ -141,10 +145,11 @@ class MainView : View
             if (selected == index)
                 g.FillRectangle(
                     5, y, g.Width - 10, jump * (text.Length / spacing + 1), Brushes.Black);
+            bool isAnswer = awnsers.ContainsKey(question) && awnsers[question] == alternative;
             g.DrawText(
                 new Rectangle(5, y, g.Width - 10, g.Height - y - 5),
                 font, StringAlignment.Near, StringAlignment.Near,
-                (selected == index, awnsers[question] == alternative) switch
+                (selected == index, isAnswer) switch
                 {
                     (true, true) => Brushes.Orange,
                     (true, false) => Brushes.SkyBlue,

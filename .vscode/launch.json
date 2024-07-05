@@ -10,9 +10,9 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/MadScientist/bin/Debug/net8.0/MadScientist.dll",
+            "program": "${workspaceFolder}/TestInspector/bin/Debug/net8.0-windows/TestInspector.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/MadScientist",
+            "cwd": "${workspaceFolder}/TestInspector",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
             "console": "internalConsole",
             "stopAtEntry": false

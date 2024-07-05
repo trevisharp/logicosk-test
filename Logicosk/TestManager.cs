@@ -102,7 +102,7 @@ public static class TestManager
         ZipArchiveEntry main = null;
         
         if (Directory.Exists("extra"))
-            Directory.Delete("extra");
+            Directory.Delete("extra", true);
         Directory.CreateDirectory("extra");
 
         foreach (var entry in zip.Entries)
