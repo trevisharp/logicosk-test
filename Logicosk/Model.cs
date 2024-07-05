@@ -8,12 +8,13 @@ public record Alternative(
 );
 
 public record Question(
-    List<string> Aspects,
+    List<int> Aspects,
     string Text,
     string Image,
     List<Alternative> Alternatives
 );
 
 public record Test(
+    string ResourceFolder,
     List<Question> Questions
 );

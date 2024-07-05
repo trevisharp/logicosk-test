@@ -12,7 +12,7 @@ Test of logic and computational skills questions repository.
     - A5: Network and Security
     - A6: Software Engineering
     - A7: AI, Machine Learning and Deep Learning
-  - Four alternatives per question.
+  - Five alternatives per question.
   - Any questions can be about more of one tested area.
   - The alternatives have not binary evaluation.
 - S2: Pratical Test with 3 code questions (1 hour)

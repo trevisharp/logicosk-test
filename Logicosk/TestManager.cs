@@ -58,7 +58,10 @@ public static class TestManager
 
     public static async Task Save(string path, Test test)
     {
-        var json = JsonSerializer.Serialize(test);
+        var options = new JsonSerializerOptions() {
+            PropertyNameCaseInsensitive = true
+        };
+        var json = JsonSerializer.Serialize(test, options);
         var content = await encrypt(json);
         
         var dir = Directory.CreateTempSubdirectory();
@@ -70,13 +73,16 @@ public static class TestManager
 
         var extraFiles = test.Questions
             .Where(q => q.Image is not null)
-            .Select(q => q.Image);
+            .Select(q => q.Image)
+            .Select(q => Path.Combine(test.ResourceFolder, q));
         
         foreach (var file in extraFiles)
         {
+            System.Console.WriteLine(file);
             if (!File.Exists(file))
                 continue;
             
+            System.Console.WriteLine(file);
             var name = Path.GetFileName(file);
             var dest = Path.Combine(extraFilesPath, name);
             File.Copy(file, dest);
@@ -85,7 +91,7 @@ public static class TestManager
         if (File.Exists(path))
             File.Delete(path);
         ZipFile.CreateFromDirectory(
-            dir.FullName, path, 
+            dir.FullName, path,
             CompressionLevel.SmallestSize, false
         );
 
@@ -108,6 +114,9 @@ public static class TestManager
                 main = entry;
                 continue;
             }
+
+            if (entry.FullName.EndsWith("/"))
+                continue;
             
             entry.ExtractToFile(entry.FullName);
         }
@@ -120,7 +129,10 @@ public static class TestManager
         var json = await decrypt(content);
         File.Delete("extracted");
         
-        return JsonSerializer.Deserialize<Test>(json);
+        var options = new JsonSerializerOptions() {
+            PropertyNameCaseInsensitive = true
+        };
+        return JsonSerializer.Deserialize<Test>(json, options);
     }
 
     private static async Task<string> decrypt(string input)
