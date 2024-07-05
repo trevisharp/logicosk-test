@@ -10,6 +10,7 @@ public record Alternative(
 public record Question(
     List<string> Aspects,
     string Text,
+    string Image,
     List<Alternative> Alternatives
 );
 

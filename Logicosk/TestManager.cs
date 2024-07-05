@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Text;
 using System.Linq;
@@ -5,7 +6,6 @@ using System.Text.Json;
 using System.IO.Compression;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
-using System;
 
 namespace Logicosk;
 
@@ -62,8 +62,25 @@ public static class TestManager
         var content = await encrypt(json);
         
         var dir = Directory.CreateTempSubdirectory();
-        var output = Path.Combine(dir.FullName, "prezip.test");
+        var output = Path.Combine(dir.FullName, "data.test");
         await File.WriteAllTextAsync(output, content);
+
+        var extraFilesPath = Path.Combine(dir.FullName, "extra");
+        Directory.CreateDirectory(extraFilesPath);
+
+        var extraFiles = test.Questions
+            .Where(q => q.Image is not null)
+            .Select(q => q.Image);
+        
+        foreach (var file in extraFiles)
+        {
+            if (!File.Exists(file))
+                continue;
+            
+            var name = Path.GetFileName(file);
+            var dest = Path.Combine(extraFilesPath, name);
+            File.Copy(file, dest);
+        }
 
         if (File.Exists(path))
             File.Delete(path);
@@ -78,7 +95,23 @@ public static class TestManager
     public static async Task<Test> Open(string path)
     {
         var zip = ZipFile.Open(path, ZipArchiveMode.Read);
-        var main = zip.Entries.FirstOrDefault();
+        ZipArchiveEntry main = null;
+        
+        if (Directory.Exists("extra"))
+            Directory.Delete("extra");
+        Directory.CreateDirectory("extra");
+
+        foreach (var entry in zip.Entries)
+        {
+            if (entry.FullName.EndsWith("data.test"))
+            {
+                main = entry;
+                continue;
+            }
+            
+            entry.ExtractToFile(entry.FullName);
+        }
+        
         if (main is null)
             return null;
         
