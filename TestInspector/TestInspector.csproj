@@ -10,4 +10,8 @@
     <PackageReference Include="pamella" Version="1.7.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Logicosk\Logicosk.csproj" />
+  </ItemGroup>
+
 </Project>

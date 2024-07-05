@@ -1,13 +1,169 @@
+using System;
 using System.Drawing;
+using System.Collections.Generic;
 
 using Pamella;
+using Logicosk;
+using System.Data.Common;
+using System.ComponentModel.Design;
 
 App.Open(new MainView());
 
 class MainView : View
 {
+    Test test = null;
+    Dictionary<Question, Alternative> awnsers = new Dictionary<Question, Alternative>();
+    Dictionary<string, Image> imgs = new Dictionary<string, Image>();
+    int current = 0;
+    int selected = 0;
+    bool showImage = false;
+    int jump = 80;
+    int spacing = 60;
+    DateTime escTime = DateTime.MaxValue;
+    protected override void OnStart(IGraphics g)
+    {
+        AlwaysInvalidateMode();
+        g.SubscribeKeyDownEvent(key => {
+            if (key == Input.Escape && escTime == DateTime.MaxValue)
+                escTime = DateTime.Now;
+
+            if (test is null)
+                return;
+
+            switch (key)
+            {
+                case Input.Down:
+                    selected++;
+                    if (selected >= test.Questions[current].Alternatives.Count)
+                        selected = 0;
+                    break;
+                
+
+                case Input.Up:
+                    selected--;
+                    if (selected < 0)
+                        selected = test.Questions[current].Alternatives.Count - 1;
+                    break;
+                
+
+                case Input.Left:
+                    current--;
+                    if (current < 0)
+                        current = this.test.Questions.Count - 1;
+                    break;
+                
+                
+                case Input.Right:
+                    current++;
+                    if (current >= this.test.Questions.Count)
+                        current = 0;
+                    break;
+                
+
+                case Input.I:
+                    showImage = !showImage;
+                    break;
+                
+
+                case Input.W:
+                    jump--;
+                    break;
+
+
+                case Input.S:
+                    jump++;
+                    break;
+                
+
+                case Input.Enter:
+                    var question = test.Questions[current];
+                    var awnser = question.Alternatives[selected];
+
+                    if (awnsers.ContainsKey(question))
+                        awnsers[question] = awnser;
+                    else awnsers.Add(question, awnser);
+                    break;
+            }
+
+        });
+        g.SubscribeKeyUpEvent(key => {
+            if (key == Input.Escape)
+                escTime = DateTime.MaxValue;
+        });
+    }
+
+    protected override void OnFrame(IGraphics g)
+    {
+        var time = DateTime.Now - escTime;
+        if (time.TotalSeconds > 2f)
+            App.Close();
+    }
+
     protected override void OnRender(IGraphics g)
     {
-        g.Clear(Color.White);
+        g.Clear(Color.SkyBlue);
+        if (this.test is null)
+            return;
+
+        var question = this.test.Questions[current];
+        var font = new Font("Arial", 40);
+
+        g.DrawText(
+            new Rectangle(5, 5, g.Width - 10, g.Height - 10),
+            font, StringAlignment.Near, StringAlignment.Near,
+            question.Text
+        );
+        int y = 5 + jump * question.Text.Length / spacing;
+
+        if (question.Image is not null)
+        {
+            g.DrawText(
+                new Rectangle(5, y, g.Width - 10, g.Height - 10),
+                new Font("Arial", 20), StringAlignment.Near, StringAlignment.Near,
+                "Pressione i para ver a imagem"
+            );
+            y += 40;
+        }
+        
+        if (showImage && question.Image is not null)
+        {
+            g.DrawImage(
+                new RectangleF(5, 5, g.Width - 10, g.Height - 10),
+                getImage(question.Image)
+            );
+            return;
+        }
+
+        int index = 0;
+        foreach (var alternative in question.Alternatives)
+        {
+            var text = alternative.Text;
+            if (selected == index)
+                g.FillRectangle(
+                    5, y, g.Width - 10, jump * (text.Length / spacing + 1), Brushes.Black);
+            g.DrawText(
+                new Rectangle(5, y, g.Width - 10, g.Height - y - 5),
+                font, StringAlignment.Near, StringAlignment.Near,
+                (selected == index, awnsers[question] == alternative) switch
+                {
+                    (true, true) => Brushes.Orange,
+                    (true, false) => Brushes.SkyBlue,
+                    (false, true) => Brushes.DarkOrange,
+                    (false, false) => Brushes.Black
+                }, text
+            );
+            y += jump * (text.Length / spacing + 1);
+            index++;
+        }
+    }
+
+    Image getImage(string key)
+    {
+        if (imgs.TryGetValue(key, out Image value))
+            return value;
+        
+        var img = Image.FromFile(key);
+        imgs[key] = img;
+        return img;
     }
 }

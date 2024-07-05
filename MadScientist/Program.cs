@@ -1,10 +1,17 @@
-﻿using System;
-using Logicosk;
+﻿using Logicosk;
+using System.IO;
 
-using System.Drawing;
+if (args[0] == "clear")
+{
+    Directory.Delete("extra", true);
+    File.Delete("result.test");
+    File.Delete("current.key");
+    return;
+}
 
-var test = await TestBuilder.CreateTest("../../repo");
-await TestManager.Save("result.test", test);
-
-Test test1 = await TestManager.Open("result.test");
-System.Console.WriteLine(test1.Questions[0]);
+if (args[0] == "new")
+{
+    var test = await TestBuilder.CreateTest(args[1]);
+    await TestManager.Save("result.test", test);
+    return;
+}
