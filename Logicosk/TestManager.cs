@@ -74,15 +74,13 @@ public static class TestManager
         var extraFiles = test.Questions
             .Where(q => q.Image is not null)
             .Select(q => q.Image)
-            .Select(q => Path.Combine(test.ResourceFolder, q));
+            .Select(q => Path.Combine(test.ResourceFolder, "S1", q));
         
         foreach (var file in extraFiles)
         {
-            System.Console.WriteLine(file);
             if (!File.Exists(file))
                 continue;
             
-            System.Console.WriteLine(file);
             var name = Path.GetFileName(file);
             var dest = Path.Combine(extraFilesPath, name);
             File.Copy(file, dest);

@@ -9,6 +9,16 @@ namespace Logicosk;
 
 public static class TestBuilder
 {
+    public static async Task<Test> CreateTest(string baseFolder)
+    {
+        var questions = await GetQuestions(
+            Path.Combine(baseFolder, "S1"), 30
+        );
+
+        var test = new Test(baseFolder, questions);
+        return test;
+    }
+
     public static async Task<List<Question>> GetQuestions(string questionFolder, int size)
     {
         var questionFiles = 
