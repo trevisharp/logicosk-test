@@ -1,15 +1,14 @@
 using System;
 using System.Drawing;
+using System.Threading;
 using System.Collections.Generic;
 
 using Pamella;
 using Logicosk;
-using System.Threading.Tasks;
-using System.Threading;
 
-App.Open(new MainView("result.test"));
+App.Open(new QuestionsView("result.test"));
 
-class MainView(string path) : View
+class QuestionsView(string path) : View
 {
     Test test = null;
     Dictionary<Question, Alternative> awnsers = new Dictionary<Question, Alternative>();
@@ -71,7 +70,7 @@ class MainView(string path) : View
                 case Input.I:
                     showImage = !showImage;
                     break;
-                
+
 
                 case Input.W:
                     jump--;
@@ -82,6 +81,16 @@ class MainView(string path) : View
                     jump++;
                     break;
                 
+                
+                case Input.A:
+                    spacing--;
+                    break;
+                
+
+                case Input.Q:
+                    spacing++;
+                    break;
+
 
                 case Input.Enter:
                     var question = test.Questions[current];
@@ -178,6 +187,12 @@ class MainView(string path) : View
             },
             $"{remainingTime.Hours:00}:{remainingTime.Minutes:00}:{remainingTime.Seconds:00}"
         );
+
+        if (DateTime.Now > testFinal)
+        {
+            App.Pop();
+            App.Open(new PraticalView(test, awnsers));
+        }
     }
 
     Image getImage(string key)
@@ -189,4 +204,9 @@ class MainView(string path) : View
         imgs[key] = img;
         return img;
     }
+}
+
+class PraticalView(Test test, Dictionary<Question, Alternative> awnsers) : View
+{
+    
 }
