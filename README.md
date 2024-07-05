@@ -10,9 +10,9 @@ Test of logic and computational skills questions repository.
     - A3: Modern Object Oriented and Funcional Languages
     - A4: Frontend Development
     - A5: Network and Security
-    - A6: Software Engineering
+    - A6: Software Engineering and Quality
     - A7: AI, Machine Learning and Deep Learning
-  - Five alternatives per question.
+  - Four alternatives per question.
   - Any questions can be about more of one tested area.
   - The alternatives have not binary evaluation.
 - S2: Pratical Test with 3 code questions (1 hour)

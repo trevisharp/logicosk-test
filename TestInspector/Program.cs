@@ -54,6 +54,7 @@ class QuestionsView(string path) : View
                 
 
                 case Input.Left:
+                    showImage = false;
                     current--;
                     if (current < 0)
                         current = this.test.Questions.Count - 1;
@@ -61,6 +62,7 @@ class QuestionsView(string path) : View
                 
                 
                 case Input.Right:
+                    showImage = false;
                     current++;
                     if (current >= this.test.Questions.Count)
                         current = 0;
@@ -208,5 +210,5 @@ class QuestionsView(string path) : View
 
 class PraticalView(Test test, Dictionary<Question, Alternative> awnsers) : View
 {
-    
+
 }
