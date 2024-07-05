@@ -16,5 +16,6 @@ public record Question(
 
 public record Test(
     string ResourceFolder,
+    int MinutesDuration,
     List<Question> Questions
 );

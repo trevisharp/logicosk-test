@@ -9,13 +9,15 @@ namespace Logicosk;
 
 public static class TestBuilder
 {
+    const int questionCount = 30;
+    const int duration = 60;
     public static async Task<Test> CreateTest(string baseFolder)
     {
         var questions = await GetQuestions(
-            Path.Combine(baseFolder, "S1"), 30
+            Path.Combine(baseFolder, "S1"), questionCount
         );
 
-        var test = new Test(baseFolder, questions);
+        var test = new Test(baseFolder, duration, questions);
         return test;
     }
 

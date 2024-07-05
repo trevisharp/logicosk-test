@@ -20,10 +20,14 @@ class MainView(string path) : View
     int jump = 80;
     int spacing = 60;
     DateTime escTime = DateTime.MaxValue;
-    protected override async void OnStart(IGraphics g)
+    DateTime testFinal;
+    protected override void OnStart(IGraphics g)
     {
         new Thread(async () => {
             test = await TestManager.Open(path);
+            testFinal = DateTime.Now.Add(
+                TimeSpan.FromMinutes(test.MinutesDuration)
+            );
         }).Start();
 
         AlwaysInvalidateMode();
@@ -160,6 +164,20 @@ class MainView(string path) : View
             y += jump * (text.Length / spacing + 1);
             index++;
         }
+        
+        var timeFont = new Font("Arial", 16);
+        var remainingTime = testFinal - DateTime.Now;
+        g.DrawText(
+            new RectangleF(g.Width - 120, g.Height - 30, 120, 30),
+            timeFont, remainingTime.TotalMinutes switch
+            {
+                <= 15 and > 5 => Brushes.Yellow,
+                <= 5 and > 1 => Brushes.Orange,
+                <= 1 => Brushes.Red,
+                _ => Brushes.Black
+            },
+            $"{remainingTime.Hours:00}:{remainingTime.Minutes:00}:{remainingTime.Seconds:00}"
+        );
     }
 
     Image getImage(string key)
