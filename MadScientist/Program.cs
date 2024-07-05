@@ -3,10 +3,8 @@ using Logicosk;
 
 using System.Drawing;
 
-Test test = new Test([
-    new Question([], "", "q7.png", [])
-]);
+var questions = await TestBuilder.GetQuestions("../../S1", 1);
+var test = new Test("../../S1", questions);
 await TestManager.Save("result.test", test);
-
 Test test1 = await TestManager.Open("result.test");
-System.Console.WriteLine(test1.Questions.Count);
+System.Console.WriteLine(test1.Questions[0]);
