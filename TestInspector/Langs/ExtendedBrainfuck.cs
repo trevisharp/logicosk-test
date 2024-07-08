@@ -1,11 +1,134 @@
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Text;
-using System.Windows.Forms;
+using System.Linq;
+using System.Collections.Generic;
 
 public class ExtendedBrainfuck : PseudoLanguage
 {
+    public override Dictionary<string, string> Tutorial() => new(){
+        { "Variávies",
+            """
+            No ebf todas as variáveis são ponteiros que podem ser acessados e
+            declarados usando a função goto:
+            @
+            main:
+                goto myVar
+            @
+            Depois de usar goto para acessar o ponteiro de uma variável qualquer
+            valor digitado define seus dados:
+            @
+            main:
+                goto myVar
+                8 // agora myVar vale 8
+                goto myOtherVar
+                myVar // agora myOtherVar vale 8 também
+            @
+            """
+        },
+        { "Operações", 
+            """
+            Ao acessar uma variável, você pode incrementar seu valor
+            ou decrementá-lo da seguinte forma:
+            @
+            main:
+                goto var
+                8 // var vale 8 aqui
+                + // var vale 9 aqui
+                + // var vale 10 aqui
+                + // var vale 11 aqui
+                - // var vale 10 aqui
+            @
+            """
+        },
+        { "Funções",
+            """
+            Todo programa ebf precisa de uma função main! Declarando funções:
+            @
+            main:
+                // código aqui
+            nomedafunção:
+                // código aqui
+            outrafunção:
+                // código aqui
+            @
+            Chamando funções:
+            @
+            main:
+                call myfunc parametros
+            myfunc:
+                // código aqui
+            @
+            """
+        },
+        { "Parâmetros",
+            """
+            Para acessar os parâmetros, em ordem, que foram enviados para função use
+            o caractér especial '.' (ponto).
+            @
+            main:
+                goto valor
+                4
+                call func valor
+
+            func:
+                goto variavel
+                . // variavel vale 4
+            @
+            """
+        },
+        { "Retornos",
+            """
+            Toda função tem uma variável especial chamada result que armazena o
+            retorno da função, basta usá-lo. Inclusive a variável que está sendo
+            usada no inicio do código sempre será a result:
+            @
+            main:
+                goto var
+                5
+                goto result
+                call somadois var // result vale 5 + 2 = 7
+            somadois:
+                goto result // desnecessário, visto que começamos usando o result
+                . // passa a entrada da função para result
+                +
+                + // soma dois
+                exit // retorna o result
+            """
+        },
+        { "Fluxo",
+            """
+            Você pode utilizar de "[" e "]" para criar whiles:
+            @
+            main:
+                10 // result vale 10
+                [ // enquanto result != 0, repita
+                    -
+                ]
+
+                ![
+                    + // enquanto result == 0 repita
+                ]
+            @
+            Você pode fazer um 'if' utilizando deste artefato:
+            @
+            add:
+            .
+            goto other
+            .
+            ![
+                exit // se other é zero, retorna
+            ]
+            [
+                -
+                goto result
+                +
+                goto other
+            ]
+            exit
+            @
+            """
+        }
+    };
+
     protected override string convert(string source, StringBuilder sb)
     {
         var code = new StringBuilder();

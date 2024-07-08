@@ -11,6 +11,8 @@ using System.Windows.Forms;
 
 public abstract class PseudoLanguage
 {
+    public abstract Dictionary<string, string> Tutorial();
+
     protected abstract string convert(string source, StringBuilder sb);
 
     public Func<T, R> Compile<T, R>(string source, StringBuilder sb)

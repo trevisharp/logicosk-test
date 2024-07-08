@@ -7,8 +7,6 @@ add:
     .
     goto other
     .
-
-    goto other
     [
         -
         goto result
