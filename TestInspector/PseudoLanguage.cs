@@ -1,16 +1,22 @@
+using System;
 using System.IO;
+using System.Text;
 using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using System.Text;
-using System;
-using System.Windows.Forms;
 
 public abstract class PseudoLanguage
 {
+    public static PseudoLanguage New(string lang)
+        => lang switch
+        {
+            "ebf" => new ExtendedBrainfuck(),
+            _ => throw new NotImplementedException("Not Implemented Language")
+        };
+
     public abstract Dictionary<string, string> Tutorial();
 
     protected abstract string convert(string source, StringBuilder sb);
