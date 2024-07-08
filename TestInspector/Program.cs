@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using Pamella;
 using Logicosk;
 
-
 App.Open(new FirstView(args[0]));
 
 class FirstView(string path) : View
