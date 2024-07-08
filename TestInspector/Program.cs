@@ -6,10 +6,12 @@ using System.Collections.Generic;
 using Pamella;
 using Logicosk;
 
+
 App.Open(new QuestionsView("result.test"));
 
 class QuestionsView(string path) : View
 {
+    const string seed = "etsps2024401";
     Test test = null;
     Dictionary<Question, Alternative> awnsers = new Dictionary<Question, Alternative>();
     Dictionary<string, Image> imgs = new Dictionary<string, Image>();
@@ -24,10 +26,17 @@ class QuestionsView(string path) : View
     protected override void OnStart(IGraphics g)
     {
         new Thread(async () => {
-            test = await TestManager.Open(path);
-            testFinal = DateTime.Now.Add(
-                TimeSpan.FromMinutes(test.MinutesDuration)
-            );
+            try
+            {
+                test = await TestManager.Open(path, seed);
+                testFinal = DateTime.Now.Add(
+                    TimeSpan.FromMinutes(test.MinutesDuration)
+                );
+            }
+            catch (Exception ex)
+            {
+                System.Windows.Forms.MessageBox.Show(ex.Message + "\n" + ex.StackTrace);
+            }
         }).Start();
 
         AlwaysInvalidateMode();
@@ -231,5 +240,5 @@ class QuestionsView(string path) : View
 
 class PraticalView(Test test, Dictionary<Question, Alternative> awnsers) : View
 {
-    
+
 }
