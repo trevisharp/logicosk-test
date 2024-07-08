@@ -154,7 +154,7 @@ public class ExtendedBrainfuck : PseudoLanguage
                     { "result", 0 }
                 };
                 currentFunc = line.Replace(":", "");
-                code.AppendLine($"public static int {currentFunc}(params int[] inputs) {{");
+                code.AppendLine($"public static object {currentFunc}(params object[] inputs) {{");
                 code.AppendLine("List<int> memory = [ 0 ];");
                 code.AppendLine("int pointer = 0;");
                 code.AppendLine("int inputIndex = 0;");
@@ -179,7 +179,7 @@ public class ExtendedBrainfuck : PseudoLanguage
             }
 
             if (line.StartsWith(".")) {
-                code.AppendLine($"memory[pointer] = inputs[inputIndex];");
+                code.AppendLine($"memory[pointer] = (int)inputs[inputIndex];");
                 code.AppendLine($"inputIndex++;");
                 continue;
             }
@@ -217,7 +217,7 @@ public class ExtendedBrainfuck : PseudoLanguage
             if (line.StartsWith("call"))
             {
                 var data = line.Split(" ");
-                code.Append($"memory[pointer] = {data[1]}(");
+                code.Append($"memory[pointer] = (int){data[1]}(");
                 for (int i = 2; i < data.Length; i++)
                 {
                     var variable = data[i];
