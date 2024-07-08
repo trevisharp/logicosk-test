@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using System.Text;
 using System;
+using System.Windows.Forms;
 
 public abstract class PseudoLanguage
 {
@@ -15,11 +16,14 @@ public abstract class PseudoLanguage
     public Func<T, R> Compile<T, R>(string source, StringBuilder sb)
     {
         var code = convert(source, sb);
+        File.WriteAllText("banana", code);
         if (sb.Length > 0)
             return null;
 
-        var assembly = compile(source, sb);
+        var assembly = compile(code, sb);
         if (sb.Length > 0)
+            return null;
+        if (assembly is null)
             return null;
         
         var defaultType = assembly.GetType("defaultType");
