@@ -7,12 +7,52 @@ using Pamella;
 using Logicosk;
 
 
-App.Open(new QuestionsView("result.test"));
+App.Open(new FirstView(args[0]));
 
-class QuestionsView(string path) : View
+class FirstView(string path) : View
 {
     const string seed = "etsps2024401";
     Test test = null;
+    protected override void OnStart(IGraphics g)
+    {
+        new Thread(async () => {
+            try
+            {
+                test = await TestManager.Open(path, seed);
+            }
+            catch (Exception ex)
+            {
+                System.Windows.Forms.MessageBox.Show(ex.Message + "\n" + ex.StackTrace);
+            }
+        }).Start();
+
+        Action<Input> ev = null;
+        ev = key => {
+            if (test is null)
+                return;
+            
+            if (key == Input.Space)
+            {
+                App.Clear();
+                App.Push(new QuestionsView(test, ev));
+            }
+        };
+        g.SubscribeKeyDownEvent(ev);
+    }
+
+    protected override void OnRender(IGraphics g)
+    {
+        g.DrawText(
+            new Rectangle(5, 5, g.Width - 10, g.Height - 10),
+            new Font("Arial", 140), 
+            StringAlignment.Center, StringAlignment.Center,
+            "Aperte espaço para começar..."
+        );
+    }
+}
+
+class QuestionsView(Test test, Action<Input> oldEvent) : View
+{
     Dictionary<Question, Alternative> awnsers = new Dictionary<Question, Alternative>();
     Dictionary<string, Image> imgs = new Dictionary<string, Image>();
     int current = 0;
@@ -25,19 +65,10 @@ class QuestionsView(string path) : View
     DateTime testFinal;
     protected override void OnStart(IGraphics g)
     {
-        new Thread(async () => {
-            try
-            {
-                test = await TestManager.Open(path, seed);
-                testFinal = DateTime.Now.Add(
-                    TimeSpan.FromMinutes(test.MinutesDuration)
-                );
-            }
-            catch (Exception ex)
-            {
-                System.Windows.Forms.MessageBox.Show(ex.Message + "\n" + ex.StackTrace);
-            }
-        }).Start();
+        g.UnsubscribeKeyDownEvent(oldEvent);
+        testFinal = DateTime.Now.Add(
+            TimeSpan.FromMinutes(test.MinutesDuration)
+        );
 
         AlwaysInvalidateMode();
         g.SubscribeKeyDownEvent(key => {
@@ -67,14 +98,14 @@ class QuestionsView(string path) : View
                     showImage = false;
                     current--;
                     if (current < 0)
-                        current = this.test.Questions.Count - 1;
+                        current = test.Questions.Count - 1;
                     break;
                 
                 
                 case Input.Right:
                     showImage = false;
                     current++;
-                    if (current >= this.test.Questions.Count)
+                    if (current >= test.Questions.Count)
                         current = 0;
                     break;
                 
@@ -143,14 +174,14 @@ class QuestionsView(string path) : View
                 new Rectangle(5, 5, g.Width - 10, g.Height - 10),
                 new Font("Arial", 140), 
                 StringAlignment.Center, StringAlignment.Center,
-                "Waiting..."
+                "Aguardando..."
             );
             timeCheck();
             return;
         }
         
         var font = new Font("Arial", 40);
-        var question = this.test.Questions[current];
+        var question = test.Questions[current];
 
         g.DrawText(
             new Rectangle(5, 5, g.Width - 10, g.Height - 10),
