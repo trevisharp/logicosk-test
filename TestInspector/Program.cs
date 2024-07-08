@@ -16,6 +16,7 @@ class QuestionsView(string path) : View
     int current = 0;
     int selected = 0;
     bool showImage = false;
+    bool waitingEnd = false;
     int jump = 80;
     int spacing = 60;
     DateTime escTime = DateTime.MaxValue;
@@ -73,6 +74,9 @@ class QuestionsView(string path) : View
                     showImage = !showImage;
                     break;
 
+                case Input.F:
+                    waitingEnd = !waitingEnd;
+                    break;
 
                 case Input.W:
                     jump--;
@@ -124,8 +128,20 @@ class QuestionsView(string path) : View
         if (test is null)
             return;
         
-        var question = this.test.Questions[current];
+        if (waitingEnd)
+        {
+            g.DrawText(
+                new Rectangle(5, 5, g.Width - 10, g.Height - 10),
+                new Font("Arial", 140), 
+                StringAlignment.Center, StringAlignment.Center,
+                "Waiting..."
+            );
+            timeCheck();
+            return;
+        }
+        
         var font = new Font("Arial", 40);
+        var question = this.test.Questions[current];
 
         g.DrawText(
             new Rectangle(5, 5, g.Width - 10, g.Height - 10),
@@ -175,25 +191,30 @@ class QuestionsView(string path) : View
             y += jump * (text.Length / spacing + 1);
             index++;
         }
-        
-        var timeFont = new Font("Arial", 16);
-        var remainingTime = testFinal - DateTime.Now;
-        g.DrawText(
-            new RectangleF(g.Width - 120, g.Height - 30, 120, 30),
-            timeFont, remainingTime.TotalMinutes switch
-            {
-                <= 15 and > 5 => Brushes.Yellow,
-                <= 5 and > 1 => Brushes.Orange,
-                <= 1 => Brushes.Red,
-                _ => Brushes.Black
-            },
-            $"{remainingTime.Hours:00}:{remainingTime.Minutes:00}:{remainingTime.Seconds:00}"
-        );
 
-        if (DateTime.Now > testFinal)
+        timeCheck();
+
+        void timeCheck()
         {
-            App.Pop();
-            App.Open(new PraticalView(test, awnsers));
+            var timeFont = new Font("Arial", 16);
+            var remainingTime = testFinal - DateTime.Now;
+            g.DrawText(
+                new RectangleF(g.Width - 120, g.Height - 30, 120, 30),
+                timeFont, remainingTime.TotalMinutes switch
+                {
+                    <= 15 and > 5 => Brushes.Yellow,
+                    <= 5 and > 1 => Brushes.Orange,
+                    <= 1 => Brushes.Red,
+                    _ => Brushes.Black
+                },
+                $"{remainingTime.Hours:00}:{remainingTime.Minutes:00}:{remainingTime.Seconds:00}"
+            );
+
+            if (DateTime.Now > testFinal)
+            {
+                App.Pop();
+                App.Open(new PraticalView(test, awnsers));
+            }
         }
     }
 
@@ -210,5 +231,5 @@ class QuestionsView(string path) : View
 
 class PraticalView(Test test, Dictionary<Question, Alternative> awnsers) : View
 {
-
+    
 }
