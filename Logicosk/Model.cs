@@ -2,6 +2,13 @@ using System.Collections.Generic;
 
 namespace Logicosk;
 
+public record Test(
+    string ResourceFolder,
+    int MinutesDuration,
+    List<Question> Questions,
+    List<PraticalTest> PraticalTests
+);
+
 public record Alternative(
     string Text,
     float Correctness
@@ -12,12 +19,6 @@ public record Question(
     string Text,
     string Image,
     List<Alternative> Alternatives
-);
-
-public record Test(
-    string ResourceFolder,
-    int MinutesDuration,
-    List<Question> Questions
 );
 
 public record AutoTest(
