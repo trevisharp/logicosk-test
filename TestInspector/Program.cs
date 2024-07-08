@@ -62,7 +62,10 @@ class QuestionsView(Test test, Action<Input> oldEvent) : View
     int jump = 80;
     int spacing = 60;
     DateTime escTime = DateTime.MaxValue;
+    DateTime spaceTime = DateTime.MaxValue;
     DateTime testFinal;
+    Action<Input> oldKeyEventDown = null;
+    Action<Input> oldKeyEventUp = null;
     protected override void OnStart(IGraphics g)
     {
         g.UnsubscribeKeyDownEvent(oldEvent);
@@ -71,9 +74,12 @@ class QuestionsView(Test test, Action<Input> oldEvent) : View
         );
 
         AlwaysInvalidateMode();
-        g.SubscribeKeyDownEvent(key => {
+        g.SubscribeKeyDownEvent(oldKeyEventDown = key => {
             if (key == Input.Escape && escTime == DateTime.MaxValue)
                 escTime = DateTime.Now;
+
+            if (key == Input.Space && spaceTime == DateTime.MaxValue && waitingEnd)
+                spaceTime = DateTime.Now;
 
             if (test is null)
                 return;
@@ -149,9 +155,12 @@ class QuestionsView(Test test, Action<Input> oldEvent) : View
             }
 
         });
-        g.SubscribeKeyUpEvent(key => {
+        g.SubscribeKeyUpEvent(oldKeyEventUp = key => {
             if (key == Input.Escape)
                 escTime = DateTime.MaxValue;
+            
+            if (key == Input.Space)
+                spaceTime = DateTime.MaxValue;
         });
     }
 
@@ -160,6 +169,13 @@ class QuestionsView(Test test, Action<Input> oldEvent) : View
         var time = DateTime.Now - escTime;
         if (time.TotalSeconds > 2f)
             App.Close();
+        
+        time = DateTime.Now - spaceTime;
+        if (time.TotalSeconds > 2f)
+        {
+            App.Clear();
+            App.Push(new PraticalView(test, awnsers, oldKeyEventDown, oldKeyEventUp));
+        }
     }
 
     protected override void OnRender(IGraphics g)
@@ -175,6 +191,12 @@ class QuestionsView(Test test, Action<Input> oldEvent) : View
                 new Font("Arial", 140), 
                 StringAlignment.Center, StringAlignment.Center,
                 "Aguardando..."
+            );
+            g.DrawText(
+                new Rectangle(5, g.Height - 20, g.Width - 10, 20),
+                new Font("Arial", 20), 
+                StringAlignment.Center, StringAlignment.Center,
+                "Segure o espaço para finalizar a prova com antecedência"
             );
             timeCheck();
             return;
@@ -253,7 +275,7 @@ class QuestionsView(Test test, Action<Input> oldEvent) : View
             if (DateTime.Now > testFinal)
             {
                 App.Pop();
-                App.Open(new PraticalView(test, awnsers));
+                App.Open(new PraticalView(test, awnsers, oldKeyEventDown, oldKeyEventUp));
             }
         }
     }
@@ -269,7 +291,15 @@ class QuestionsView(Test test, Action<Input> oldEvent) : View
     }
 }
 
-class PraticalView(Test test, Dictionary<Question, Alternative> awnsers) : View
+class PraticalView(
+    Test test, 
+    Dictionary<Question, Alternative> awnsers,
+    Action<Input> oldDown, 
+    Action<Input> oldUp) : View
 {
-
+    protected override void OnStart(IGraphics g)
+    {
+        g.UnsubscribeKeyDownEvent(oldDown);
+        g.UnsubscribeKeyUpEvent(oldUp);
+    }
 }
