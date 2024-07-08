@@ -1,0 +1,73 @@
+using System.Collections.Generic;
+System.Console.WriteLine(42);
+public static class defaultType {
+public static int main(params int[] inputs) {
+List<int> memory = [ 0 ];
+int pointer = 0;
+int inputIndex = 0;
+memory[pointer] = inputs[inputIndex];
+inputIndex++;
+memory[pointer] = fact(memory[0]);
+return memory[0];
+}
+public static int add(params int[] inputs) {
+List<int> memory = [ 0 ];
+int pointer = 0;
+int inputIndex = 0;
+memory[pointer] = inputs[inputIndex];
+inputIndex++;
+memory.Add(0);
+pointer = 1;
+memory[pointer] = inputs[inputIndex];
+inputIndex++;
+while(memory[pointer] != 0) {
+memory[pointer]--;
+pointer = 0;
+memory[pointer]++;
+pointer = 1;
+}
+return memory[0];
+}
+public static int mul(params int[] inputs) {
+List<int> memory = [ 0 ];
+int pointer = 0;
+int inputIndex = 0;
+memory[pointer] = 0;
+memory.Add(0);
+pointer = 1;
+memory[pointer] = inputs[inputIndex];
+inputIndex++;
+memory.Add(0);
+pointer = 2;
+memory[pointer] = inputs[inputIndex];
+inputIndex++;
+pointer = 1;
+while(memory[pointer] != 0) {
+pointer = 0;
+memory[pointer] = add(memory[2], memory[0]);
+pointer = 1;
+memory[pointer]--;
+}
+return memory[0];
+}
+public static int fact(params int[] inputs) {
+List<int> memory = [ 0 ];
+int pointer = 0;
+int inputIndex = 0;
+memory[pointer] = inputs[inputIndex];
+inputIndex++;
+memory.Add(0);
+pointer = 1;
+memory[pointer] = memory[0];
+while(memory[pointer] == 0) {
+pointer = 0;
+memory[pointer] = 1;
+return memory[0];
+}
+memory[pointer]--;
+memory[pointer] = fact(memory[1]);
+pointer = 0;
+memory[pointer] = mul(memory[1], memory[0]);
+return memory[0];
+}
+}
