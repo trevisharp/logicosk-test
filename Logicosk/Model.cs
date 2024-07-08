@@ -19,3 +19,17 @@ public record Test(
     int MinutesDuration,
     List<Question> Questions
 );
+
+public record AutoTest(
+    List<object> Inputs,
+    object Output,
+    bool Hidden
+);
+
+public record PraticalTest(
+    string Text,
+    string Example,
+    bool Performance,
+    string Language,
+    List<AutoTest> Tests
+);

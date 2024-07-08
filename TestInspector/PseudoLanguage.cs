@@ -18,7 +18,6 @@ public abstract class PseudoLanguage
     public Func<T, R> Compile<T, R>(string source, StringBuilder sb)
     {
         var code = convert(source, sb);
-        File.WriteAllText("banana", code);
         if (sb.Length > 0)
             return null;
 
