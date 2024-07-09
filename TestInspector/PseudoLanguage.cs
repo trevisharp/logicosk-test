@@ -25,15 +25,21 @@ public abstract class PseudoLanguage
     {
         var code = convert(source, sb);
         if (sb.Length > 0)
+        {
+            sb.Insert(0, "Erros de Sintaxes encontrados:\n");
             return null;
+        }
 
         var assembly = compile(code, sb);
         if (sb.Length > 0)
+        {
+            sb.Insert(0, "Erros Semânticos encontrados:\n");
             return null;
+        }
         if (assembly is null)
             return null;
         
-        var defaultType = assembly.GetType("defaultType");
+        var defaultType = assembly.GetType("TestePratico");
         var mainCode = defaultType.GetMethod("main");
         return x => (R)mainCode.Invoke(null, [x]);
     }

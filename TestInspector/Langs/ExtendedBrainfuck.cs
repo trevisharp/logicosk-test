@@ -133,8 +133,8 @@ public class ExtendedBrainfuck : PseudoLanguage
     {
         var code = new StringBuilder();
         code.AppendLine("using System.Collections.Generic;");
-        code.AppendLine("defaultType.main(1, 2, 3);");
-        code.AppendLine("public static class defaultType {");
+        code.AppendLine("TestePratico.main(1, 2, 3);");
+        code.AppendLine("public static class TestePratico {");
 
         var lines = source.Split("\n");
         string currentFunc = null;

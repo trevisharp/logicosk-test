@@ -8,10 +8,8 @@ using Pamella;
 using Logicosk;
 using System.Linq;
 using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Drawing.Design;
-using System.Dynamic;
+using System.Security.Principal;
 
 class PraticalView(
     Test test, 
@@ -21,10 +19,11 @@ class PraticalView(
 {
     Dictionary<PraticalTest, float> bestResult = new();
     Dictionary<PraticalTest, Dictionary<string, string>> docs = new();
+    Dictionary<PraticalTest, string> lastResult = new();
     int current = 0;
     int page = 0;
     DateTime testFinal;
-    int spacing = 20;
+    int spacing = 22;
     protected override void OnStart(IGraphics g)
     {
         g.UnsubscribeKeyDownEvent(oldDown);
@@ -38,6 +37,7 @@ class PraticalView(
             File.Create(file).Close();
             bestResult.Add(pratical, 0f);
             docs.Add(pratical, PseudoLanguage.New(pratical.Language).Tutorial());
+            lastResult.Add(pratical, "Nenhuma execução registrada...");
         }
 
         testFinal = DateTime.Now.AddMinutes(test.MinutesDuration);
@@ -57,11 +57,13 @@ class PraticalView(
 
                     
                 case Input.Left:
+                    page = 0;
                     current--;
                     break;
 
                     
                 case Input.Right:
+                    page = 0;
                     current++;
                     break;
                 
@@ -86,18 +88,18 @@ class PraticalView(
                     var file = $"main.{pratical.Language}";
                     var code = File.ReadAllText(file);
                     
-                    var sb = new StringBuilder();
-                    var func = compiler.Compile<object[], object>(code, sb);
-                    if (sb.Length > 0)
+                    var runInfo = new StringBuilder();
+                    var func = compiler.Compile<object[], object>(code, runInfo);
+                    if (runInfo.Length > 0)
                     {
-                        System.Windows.Forms.MessageBox.Show(sb.ToString());
+                        lastResult[pratical] = runInfo.ToString();
                         return;
                     }
                     if (func is null)
                         return;
                     
                     float corrects = 0f;
-                    var resutls = new StringBuilder();
+                    var results = new StringBuilder();
                     foreach (var test in pratical?.Tests ?? [])
                     {
                         int result = Task.WaitAny(
@@ -105,6 +107,17 @@ class PraticalView(
                                 await Task.Delay(1000);
                             }),
                             Task.Run(() => {
+                                StringBuilder testInfo = new StringBuilder();
+                                if (test.Hidden)
+                                    testInfo.AppendLine("Executando teste fechado:");
+                                else
+                                {
+                                    testInfo.AppendLine("Executando teste aberto:");
+                                    string inputs = string.Join(',', test.Inputs);
+                                    testInfo.AppendLine($"Entrada: {inputs}.");
+                                    testInfo.AppendLine($"Saida esperadas: {test.Output}.");
+                                }
+
                                 try
                                 {
                                     var output = func(
@@ -116,18 +129,34 @@ class PraticalView(
                                             .Select(x => x is JsonElement el ? el.GetString() : x)
                                             .ToArray()
                                         );
+                                    if (!test.Hidden)
+                                        testInfo.AppendLine($"Saída: {output}.");
                                     
                                     if (output.ToString() != test.Output.ToString())
-                                        return;       
+                                    {
+                                        testInfo.AppendLine($"Resultado diferente do esperado. Falha no teste.");
+                                        return;
+                                    }
+                                        
+                                    testInfo.AppendLine($"Pontuação concedida.");
                                     corrects++;
                                 }
                                 catch (Exception ex)
                                 {
-                                    System.Windows.Forms.MessageBox.Show(ex.Message);
+                                    testInfo.AppendLine("O seguinte erro de execução foi encontrado:");
+                                    testInfo.AppendLine(ex.Message);
+                                }
+                                finally
+                                {
+                                    lock (runInfo)
+                                    {
+                                        runInfo.AppendLine(testInfo.ToString());
+                                    }
                                 }
                             })
                         );
                     }
+                    lastResult[pratical] = runInfo.ToString();
 
                     float pontuation = corrects / pratical.Tests.Count;
                     if (bestResult[pratical] < pontuation)
@@ -145,7 +174,10 @@ class PraticalView(
         
         int index = current % test.PraticalTests.Count;
         var pratical = test.PraticalTests[index];
-        int pageIndex = page % (1 + docs[pratical].Keys.Count);
+        int totalPages = 2 + docs[pratical].Keys.Count;
+        while (page < 0)
+            page += totalPages;
+        int pageIndex = page % totalPages;
         if (pageIndex == 0)
         {
             var font = new Font("Arial", 40);
@@ -155,19 +187,18 @@ class PraticalView(
                 Brushes.LightCoral,
                 $"""
                 Questão Prática {index + 1} / {test.PraticalTests.Count}: {pratical.Text}
-                Melhor Nota Obtida: {100 * bestResult[pratical]}%
                 
                 Exemplos: {pratical.Example}
                 Desempenho Crítico: {pratical.Performance}
                 Linguagem: {pratical.Language}
 
                 Use setar para cima e baixo para navegar entre as instruções e direita e
-                esquerda para alterar a questão. Use espaço para testar o código que foi
-                criado na área execução.
+                esquerda para alterar a questão. Na última página você poderá executar
+                o seu código.
                 """
             );
         }
-        else
+        else if (pageIndex < totalPages - 1)
         {
             var font = new Font("Arial", 30);
             var tutorial = docs[pratical];
@@ -202,6 +233,26 @@ class PraticalView(
                 docLines += lines;
                 code = !code;
             }
+        }
+        else
+        {
+            var font = new Font("Arial", 20);
+            g.DrawText(
+                new Rectangle(5, 5, g.Width / 2 - 5, g.Height - 10),
+                font, StringAlignment.Near, StringAlignment.Near,
+                Brushes.LightCoral,
+                $"""
+                Melhor Nota Obtida: {100 * bestResult[pratical]}%
+                
+                Edite o arquivo main.{pratical.Language} e pressione espaço para executar o código.
+                """
+            );
+            font = new Font("Arial", 12);
+            g.DrawText(
+                new Rectangle(g.Width / 2 + 5, 5, g.Width / 2 - 10, g.Height - 10),
+                font, StringAlignment.Near, StringAlignment.Near,
+                Brushes.LightCoral, lastResult[pratical]
+            );
         }
 
         timeCheck();
