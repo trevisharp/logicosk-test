@@ -14,7 +14,7 @@ public abstract class Language
 
     public abstract Dictionary<string, string> Tutorial();
     
-    public abstract Func<T, R> Compile<T, R>(string source, StringBuilder sb);
+    public abstract Func<T, object> Compile<T>(string source, StringBuilder sb);
 
     public abstract string BaseCode { get; }
 }

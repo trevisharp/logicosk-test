@@ -9,6 +9,7 @@ using Logicosk;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Threading;
 
 class PraticalView(
     Test test, 
@@ -42,7 +43,7 @@ class PraticalView(
 
         testFinal = DateTime.Now.AddMinutes(test.MinutesDuration);
 
-        g.SubscribeKeyDownEvent(key => {
+        g.SubscribeKeyDownEvent(async key => {
             
             switch (key)
             {
@@ -86,41 +87,35 @@ class PraticalView(
                     var compiler = Language.New(pratical.Language);
                     
                     var file = $"main.{pratical.Language}";
-                    var code = File.ReadAllText(file);
                     
                     var runInfo = new StringBuilder();
-                    var func = compiler.Compile<object[], object>(code, runInfo);
+                    var func = compiler.Compile<object[]>(file, runInfo);
                     if (runInfo.Length > 0)
-                    {
                         lastResult[pratical] = runInfo.ToString();
-                        return;
-                    }
                     if (func is null)
                         return;
                     
-                    float corrects = 0f;
-                    var results = new StringBuilder();
-                    foreach (var test in pratical?.Tests ?? [])
-                    {
-                        int result = Task.WaitAny(
-                            Task.Run(async () => {
-                                await Task.Delay(1000);
-                            }),
-                            Task.Run(() => {
-                                StringBuilder testInfo = new StringBuilder();
-                                if (test.Hidden)
-                                    testInfo.AppendLine("Executando teste fechado:");
-                                else
-                                {
-                                    testInfo.AppendLine("Executando teste aberto:");
-                                    string inputs = string.Join(',', test.Inputs);
-                                    testInfo.AppendLine($"Entrada: {inputs}.");
-                                    testInfo.AppendLine($"Saida esperadas: {test.Output}.");
-                                }
+                    int corrects = 0;
+                    await Task.Run(() =>
+                        Parallel.ForEach(pratical?.Tests ?? [], test =>
+                        {
+                            StringBuilder testInfo = new StringBuilder();
+                            if (test.Hidden)
+                                testInfo.AppendLine("Executando teste fechado:");
+                            else
+                            {
+                                testInfo.AppendLine("Executando teste aberto:");
+                                string inputs = string.Join(',', test.Inputs);
+                                testInfo.AppendLine($"Entrada: {inputs}.");
+                                testInfo.AppendLine($"Saida esperada: {test.Output}.");
+                            }
 
-                                try
+                            try
+                            {
+                                object output = default;
+                                lock (func)
                                 {
-                                    var output = func(
+                                    output = func(
                                         test.Inputs
                                             .Select(x => x is JsonElement el && 
                                                 el.TryGetInt32(out int value) ? value : x)
@@ -129,36 +124,36 @@ class PraticalView(
                                             .Select(x => x is JsonElement el ? el.GetString() : x)
                                             .ToArray()
                                         );
-                                    if (!test.Hidden)
-                                        testInfo.AppendLine($"Saída: {output}.");
+                                }
+                                if (!test.Hidden)
+                                    testInfo.AppendLine($"Saida: {output}.");
+                                
+                                if (output?.ToString() != test.Output.ToString())
+                                {
+                                    testInfo.AppendLine($"Resultado diferente do esperado. Falha no teste.");
+                                    return;
+                                }
                                     
-                                    if (output.ToString() != test.Output.ToString())
-                                    {
-                                        testInfo.AppendLine($"Resultado diferente do esperado. Falha no teste.");
-                                        return;
-                                    }
-                                        
-                                    testInfo.AppendLine($"Pontuação concedida.");
-                                    corrects++;
-                                }
-                                catch (Exception ex)
+                                testInfo.AppendLine($"Pontuação concedida.");
+                                Interlocked.Increment(ref corrects);
+                            }
+                            catch (Exception ex)
+                            {
+                                testInfo.AppendLine("O seguinte erro de execução foi encontrado:");
+                                testInfo.AppendLine(ex.Message);
+                            }
+                            finally
+                            {
+                                lock (runInfo)
                                 {
-                                    testInfo.AppendLine("O seguinte erro de execução foi encontrado:");
-                                    testInfo.AppendLine(ex.Message);
+                                    runInfo.AppendLine(testInfo.ToString());
                                 }
-                                finally
-                                {
-                                    lock (runInfo)
-                                    {
-                                        runInfo.AppendLine(testInfo.ToString());
-                                    }
-                                }
-                            })
-                        );
-                    }
+                            }
+                        })
+                    );
                     lastResult[pratical] = runInfo.ToString();
 
-                    float pontuation = corrects / pratical.Tests.Count;
+                    float pontuation = corrects / (float)pratical.Tests.Count;
                     if (bestResult[pratical] < pontuation)
                         bestResult[pratical] = pontuation;
                     break;
@@ -172,6 +167,8 @@ class PraticalView(
         if (test is null)
             return;
         
+        while (current < 0)
+            current += test.PraticalTests.Count;
         int index = current % test.PraticalTests.Count;
         var pratical = test.PraticalTests[index];
         int totalPages = 2 + docs[pratical].Keys.Count;
@@ -278,6 +275,5 @@ class PraticalView(
                 App.Pop();
             }
         }
-
     }
 }

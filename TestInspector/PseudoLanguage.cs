@@ -14,9 +14,10 @@ public abstract class PseudoLanguage : Language
 
     public override string BaseCode => "";
 
-    public override Func<T, R> Compile<T, R>(string source, StringBuilder sb)
+    public override Func<T, object> Compile<T>(string source, StringBuilder sb)
     {
-        var code = convert(source, sb);
+        var code = File.ReadAllText(source);
+        code = convert(code, sb);
         if (sb.Length > 0)
         {
             sb.Insert(0, "Erros de Sintaxes encontrados:\n");
@@ -34,7 +35,7 @@ public abstract class PseudoLanguage : Language
         
         var defaultType = assembly.GetType("TestePratico");
         var mainCode = defaultType.GetMethod("main");
-        return x => (R)mainCode.Invoke(null, [x]);
+        return x => mainCode.Invoke(null, [x]);
     }
 
     Assembly compile(string code, StringBuilder messages)
