@@ -7,7 +7,7 @@ using Logicosk;
 
 class QuestionsView(Test test, Action<Input> oldEvent) : View
 {
-    Dictionary<Question, Alternative> awnsers = new Dictionary<Question, Alternative>();
+    Results results = new Results();
     Dictionary<string, Image> imgs = new Dictionary<string, Image>();
     int current = 0;
     int selected = 0;
@@ -110,9 +110,9 @@ class QuestionsView(Test test, Action<Input> oldEvent) : View
                     var question = test.Questions[current];
                     var awnser = question.Alternatives[selected];
 
-                    if (awnsers.ContainsKey(question))
-                        awnsers[question] = awnser;
-                    else awnsers.Add(question, awnser);
+                    if (results.Answers.ContainsKey(question))
+                        results.Answers[question] = awnser;
+                    else results.Answers.Add(question, awnser);
                     break;
             }
 
@@ -136,7 +136,7 @@ class QuestionsView(Test test, Action<Input> oldEvent) : View
         if (time.TotalSeconds > 2f)
         {
             App.Clear();
-            App.Push(new PraticalView(test, awnsers, oldKeyEventDown, oldKeyEventUp));
+            App.Push(new PraticalView(test, results, oldKeyEventDown, oldKeyEventUp));
         }
     }
 
@@ -205,7 +205,7 @@ class QuestionsView(Test test, Action<Input> oldEvent) : View
             if (selected == index)
                 g.FillRectangle(
                     5, y, g.Width - 10, jump * (text.Length / spacing + 1), Brushes.Black);
-            bool isAnswer = awnsers.ContainsKey(question) && awnsers[question] == alternative;
+            bool isAnswer = results.Answers.ContainsKey(question) && results.Answers[question] == alternative;
             g.DrawText(
                 new Rectangle(5, y, g.Width - 10, g.Height - y - 5),
                 font, StringAlignment.Near, StringAlignment.Near,
@@ -242,7 +242,7 @@ class QuestionsView(Test test, Action<Input> oldEvent) : View
             if (DateTime.Now > testFinal)
             {
                 App.Pop();
-                App.Open(new PraticalView(test, awnsers, oldKeyEventDown, oldKeyEventUp));
+                App.Open(new PraticalView(test, results, oldKeyEventDown, oldKeyEventUp));
             }
         }
     }

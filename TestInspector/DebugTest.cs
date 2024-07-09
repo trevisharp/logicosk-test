@@ -4,9 +4,8 @@ using Logicosk;
 using Pamella;
 
 public class DebugTest(
-    Test test, 
-    Dictionary<Question, Alternative> answers,
-    Dictionary<PraticalTest, float> bestResults
+    Test test,
+    Results results
     ) : View
 {
     protected override void OnStart(IGraphics g)

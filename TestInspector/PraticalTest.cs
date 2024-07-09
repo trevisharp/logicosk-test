@@ -13,11 +13,10 @@ using Logicosk;
 
 class PraticalView(
     Test test, 
-    Dictionary<Question, Alternative> answers,
+    Results results,
     Action<Input> oldDown, 
     Action<Input> oldUp) : View
 {
-    Dictionary<PraticalTest, float> bestResult = new();
     Dictionary<PraticalTest, Dictionary<string, string>> docs = new();
     Dictionary<PraticalTest, string> lastResult = new();
     int current = 0;
@@ -41,7 +40,7 @@ class PraticalView(
             var file = $"main.{pratical.Language}";
             var lang = Language.New(pratical.Language);
             File.WriteAllText(file, lang.BaseCode);
-            bestResult.Add(pratical, 0f);
+            results.BestResults.Add(pratical, 0f);
             docs.Add(pratical, lang.Tutorial());
             lastResult.Add(pratical, "Nenhuma execução registrada...");
         }
@@ -189,8 +188,8 @@ class PraticalView(
                     lastResult[pratical] = runInfo.ToString();
 
                     float pontuation = corrects / (float)pratical.Tests.Count;
-                    if (bestResult[pratical] < pontuation)
-                        bestResult[pratical] = pontuation;
+                    if (results.BestResults[pratical] < pontuation)
+                        results.BestResults[pratical] = pontuation;
                     loading = -1;
                     break;
             }
@@ -203,7 +202,7 @@ class PraticalView(
         if (time.TotalSeconds > 2f)
         {
             App.Clear();
-            App.Push(new DebugTest(test, answers, bestResult));
+            App.Push(new DebugTest(test, results));
         }
     }
 
@@ -308,7 +307,7 @@ class PraticalView(
                 font, StringAlignment.Near, StringAlignment.Near,
                 Brushes.LightCoral,
                 $"""
-                Melhor Nota Obtida: {100 * bestResult[pratical]}%
+                Melhor Nota Obtida: {100 * results.BestResults[pratical]}%
                 {(loading == -1 ? string.Empty : loading.ToString() + "%")}
                 
                 Edite o arquivo main.{pratical.Language} e pressione espaço para executar o código.
@@ -343,7 +342,7 @@ class PraticalView(
             if (DateTime.Now > testFinal)
             {
                 App.Pop();
-                App.Push(new DebugTest(test, answers, bestResult));
+                App.Push(new DebugTest(test, results));
             }
         }
     }
