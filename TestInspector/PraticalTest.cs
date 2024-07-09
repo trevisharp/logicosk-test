@@ -204,7 +204,6 @@ class PraticalView(
             }
         }
 
-
         timeCheck();
 
         void timeCheck()

@@ -31,6 +31,7 @@ public record PraticalTest(
     string Text,
     string Example,
     bool Performance,
+    bool Esoteric,
     string Language,
     List<AutoTest> Tests
 );

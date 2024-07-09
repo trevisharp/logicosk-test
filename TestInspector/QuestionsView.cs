@@ -18,6 +18,7 @@ class QuestionsView(Test test, Action<Input> oldEvent) : View
     DateTime escTime = DateTime.MaxValue;
     DateTime spaceTime = DateTime.MaxValue;
     DateTime testFinal;
+    DateTime waitingTime = DateTime.MaxValue;
     Action<Input> oldKeyEventDown = null;
     Action<Input> oldKeyEventUp = null;
     protected override void OnStart(IGraphics g)
@@ -75,6 +76,13 @@ class QuestionsView(Test test, Action<Input> oldEvent) : View
                     break;
 
                 case Input.F:
+                    if (waitingEnd)
+                    {
+                        var totalWaitingTime = DateTime.Now - waitingTime;
+                        if (totalWaitingTime.TotalMinutes > 3)
+                            break;
+                    }
+                    waitingTime = DateTime.Now;
                     waitingEnd = !waitingEnd;
                     break;
 
@@ -98,7 +106,7 @@ class QuestionsView(Test test, Action<Input> oldEvent) : View
                     break;
 
 
-                case Input.Enter:
+                case Input.Space:
                     var question = test.Questions[current];
                     var awnser = question.Alternatives[selected];
 
@@ -147,10 +155,15 @@ class QuestionsView(Test test, Action<Input> oldEvent) : View
                 "Aguardando..."
             );
             g.DrawText(
-                new Rectangle(5, g.Height - 20, g.Width - 10, 20),
+                new Rectangle(5, g.Height - 200, g.Width - 10, 200),
                 new Font("Arial", 20), 
                 StringAlignment.Center, StringAlignment.Center,
-                "Segure o espaço para finalizar a prova com antecedência"
+                """
+                Segure o espaço para finalizar a prova com antecedência.
+                Aperte F para voltar a realizar a prova.
+                Ficar mais de 3 minutos na tela de "aguardando..." impossibilitará você
+                de voltar a fazer a prova.
+                """
             );
             timeCheck();
             return;
