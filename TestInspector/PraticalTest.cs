@@ -9,7 +9,6 @@ using Logicosk;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using System.Security.Principal;
 
 class PraticalView(
     Test test, 
@@ -34,9 +33,10 @@ class PraticalView(
         foreach (var pratical in test.PraticalTests)
         {
             var file = $"main.{pratical.Language}";
-            File.Create(file).Close();
+            var lang = Language.New(pratical.Language);
+            File.WriteAllText(file, lang.BaseCode);
             bestResult.Add(pratical, 0f);
-            docs.Add(pratical, PseudoLanguage.New(pratical.Language).Tutorial());
+            docs.Add(pratical, lang.Tutorial());
             lastResult.Add(pratical, "Nenhuma execução registrada...");
         }
 
@@ -83,7 +83,7 @@ class PraticalView(
                 
                 case Input.Space:
                     var pratical = test.PraticalTests[current % test.PraticalTests.Count];
-                    var compiler = PseudoLanguage.New(pratical.Language);
+                    var compiler = Language.New(pratical.Language);
                     
                     var file = $"main.{pratical.Language}";
                     var code = File.ReadAllText(file);

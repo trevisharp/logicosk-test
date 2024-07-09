@@ -8,20 +8,13 @@ using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
-public abstract class PseudoLanguage
+public abstract class PseudoLanguage : Language
 {
-    public static PseudoLanguage New(string lang)
-        => lang switch
-        {
-            "ebf" => new ExtendedBrainfuck(),
-            _ => throw new NotImplementedException("Not Implemented Language")
-        };
-
-    public abstract Dictionary<string, string> Tutorial();
-
     protected abstract string convert(string source, StringBuilder sb);
 
-    public Func<T, R> Compile<T, R>(string source, StringBuilder sb)
+    public override string BaseCode => "";
+
+    public override Func<T, R> Compile<T, R>(string source, StringBuilder sb)
     {
         var code = convert(source, sb);
         if (sb.Length > 0)
