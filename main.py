@@ -1,8 +1,6 @@
 def main(args):
-    for i in range(len(args)):
-        if i == args[i]:
-            return True
-    return False
+    while True:
+        pass
 
 # Não alterar
 if __name__ == "__main__":

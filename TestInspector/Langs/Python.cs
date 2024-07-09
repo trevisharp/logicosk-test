@@ -4,6 +4,7 @@ using System.Diagnostics;
 using Pamella;
 using System.Linq;
 using System.Collections;
+using System.Threading.Tasks;
 
 public class Python : RealLanguage
 {
@@ -28,6 +29,7 @@ public class Python : RealLanguage
     public override Func<T, object> Compile<T>(string source, StringBuilder sb)
     {
         return input => {
+            object output = null;
             string parameter = 
                 input.GetType().IsArray ?
                 string.Join(' ', input as object[]) :
@@ -40,17 +42,24 @@ public class Python : RealLanguage
                     Arguments = $"python -u main.py {parameter}",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
+                    RedirectStandardInput = true,
                     CreateNoWindow = true
-                },
-                EnableRaisingEvents = true
+                }
             };
-
             process.Start();
-            process.WaitForExit();
-            object output = process.StandardOutput
-                .ReadToEnd()
-                .Replace("\n", "")
-                .Trim();
+
+            int selected = Task.WaitAny(
+                Task.Delay(5000),
+                Task.Run(() => {
+                    process.WaitForExit();
+                    output = process.StandardOutput
+                        .ReadToEnd()
+                        .Replace("\n", "")
+                        .Trim();
+                })
+            );
+            if (selected == 0)
+                return "O algoritmo demorou demais para completar.";
             
             return output;
         };

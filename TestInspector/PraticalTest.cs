@@ -97,7 +97,10 @@ class PraticalView(
                     if (runInfo.Length > 0)
                         lastResult[pratical] = runInfo.ToString();
                     if (func is null)
+                    {
+                        loading = -1;
                         return;
+                    }
                     
                     int corrects = 0;
                     var testList = pratical?.Tests ?? [];
@@ -132,7 +135,6 @@ class PraticalView(
                                         );
                                 }
                                 Interlocked.Add(ref loading, 50 / testCount);
-
                                 if (!test.Hidden)
                                     testInfo.AppendLine($"Saida: {output}.");
                                 
@@ -160,7 +162,7 @@ class PraticalView(
                             }
                         })
                     );
-                    loading = -1;
+                    loading = 100;
                     runInfo.AppendLine();
                     runInfo.AppendLine("Testes completos...");
                     lastResult[pratical] = runInfo.ToString();
@@ -168,6 +170,7 @@ class PraticalView(
                     float pontuation = corrects / (float)pratical.Tests.Count;
                     if (bestResult[pratical] < pontuation)
                         bestResult[pratical] = pontuation;
+                    loading = -1;
                     break;
             }
         });
