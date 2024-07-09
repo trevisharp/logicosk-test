@@ -12,11 +12,11 @@ using Pamella;
 using Logicosk;
 
 class PraticalView(
-    Test test, 
     Results results,
     Action<Input> oldDown, 
     Action<Input> oldUp) : View
 {
+    Test test = results.Test;
     Dictionary<PraticalTest, Dictionary<string, string>> docs = new();
     Dictionary<PraticalTest, string> lastResult = new();
     int current = 0;
@@ -202,7 +202,7 @@ class PraticalView(
         if (time.TotalSeconds > 2f)
         {
             App.Clear();
-            App.Push(new DebugTest(test, results));
+            App.Push(new DebugTest(results));
         }
     }
 
@@ -342,7 +342,7 @@ class PraticalView(
             if (DateTime.Now > testFinal)
             {
                 App.Pop();
-                App.Push(new DebugTest(test, results));
+                App.Push(new DebugTest(results));
             }
         }
     }

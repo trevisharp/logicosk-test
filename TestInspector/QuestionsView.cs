@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using Pamella;
 using Logicosk;
 
-class QuestionsView(Test test, Action<Input> oldEvent) : View
+class QuestionsView(Results results, Action<Input> oldEvent) : View
 {
-    Results results = new Results();
+    Test test = results.Test;
     Dictionary<string, Image> imgs = new Dictionary<string, Image>();
     int current = 0;
     int selected = 0;
@@ -136,7 +136,7 @@ class QuestionsView(Test test, Action<Input> oldEvent) : View
         if (time.TotalSeconds > 2f)
         {
             App.Clear();
-            App.Push(new PraticalView(test, results, oldKeyEventDown, oldKeyEventUp));
+            App.Push(new PraticalView(results, oldKeyEventDown, oldKeyEventUp));
         }
     }
 
@@ -242,7 +242,7 @@ class QuestionsView(Test test, Action<Input> oldEvent) : View
             if (DateTime.Now > testFinal)
             {
                 App.Pop();
-                App.Open(new PraticalView(test, results, oldKeyEventDown, oldKeyEventUp));
+                App.Open(new PraticalView(results, oldKeyEventDown, oldKeyEventUp));
             }
         }
     }

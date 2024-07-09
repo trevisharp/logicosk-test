@@ -1,16 +1,15 @@
-using System.Collections.Generic;
 using System.Drawing;
-using Logicosk;
+
 using Pamella;
 
 public class DebugTest(
-    Test test,
     Results results
     ) : View
 {
     protected override void OnStart(IGraphics g)
     {
-        
+        App.Pop();
+        App.Push(new ResultView(results));
     }
 
     protected override void OnRender(IGraphics g)

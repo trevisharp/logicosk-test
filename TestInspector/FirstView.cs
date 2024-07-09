@@ -8,13 +8,13 @@ using Logicosk;
 class FirstView(string path) : View
 {
     const string seed = "etsps2024401";
-    Test test = null;
+    Results results = new Results();
     protected override void OnStart(IGraphics g)
     {
         new Thread(async () => {
             try
             {
-                test = await TestManager.Open(path, seed);
+                results.Test = await TestManager.Open(path, seed);
             }
             catch (Exception ex)
             {
@@ -24,13 +24,13 @@ class FirstView(string path) : View
 
         Action<Input> ev = null;
         ev = key => {
-            if (test is null)
+            if (results.Test is null)
                 return;
             
             if (key == Input.Space)
             {
                 App.Clear();
-                App.Push(new QuestionsView(test, ev));
+                App.Push(new QuestionsView(results, ev));
             }
         };
         g.SubscribeKeyDownEvent(ev);
