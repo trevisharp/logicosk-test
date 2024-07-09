@@ -1,15 +1,15 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Linq;
 using System.Drawing;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 
 using Pamella;
 using Logicosk;
-using System.Linq;
-using System.Text.Json;
-using System.Threading.Tasks;
-using System.Threading;
 
 class PraticalView(
     Test test, 
@@ -25,6 +25,10 @@ class PraticalView(
     DateTime testFinal;
     int spacing = 22;
     int loading = -1;
+    bool waitingEnd = false;
+    DateTime waitingTime = DateTime.MaxValue;
+    DateTime spaceTime = DateTime.MaxValue;
+
     protected override void OnStart(IGraphics g)
     {
         g.UnsubscribeKeyDownEvent(oldDown);
@@ -68,6 +72,18 @@ class PraticalView(
                     page = 0;
                     current++;
                     break;
+
+
+                case Input.F:
+                    if (waitingEnd)
+                    {
+                        var totalWaitingTime = DateTime.Now - waitingTime;
+                        if (totalWaitingTime.TotalMinutes > 3)
+                            break;
+                    }
+                    waitingTime = DateTime.Now;
+                    waitingEnd = !waitingEnd;
+                    break;
                 
 
                 case Input.W:
@@ -83,7 +99,12 @@ class PraticalView(
                         spacing = 40;
                     break;
                 
+
                 case Input.Space:
+                    
+                    if (spaceTime == DateTime.MaxValue && waitingEnd)
+                        spaceTime = DateTime.Now;
+
                     if (loading != -1)
                         return;
                     loading = 0;
@@ -176,11 +197,44 @@ class PraticalView(
         });
     }
 
+    protected override void OnFrame(IGraphics g)
+    {
+        var time = DateTime.Now - spaceTime;
+        if (time.TotalSeconds > 2f)
+        {
+            App.Clear();
+            App.Push(new DebugTest(test, answers, bestResult));
+        }
+    }
+
     protected override void OnRender(IGraphics g)
     {
         g.Clear(Color.DarkGreen);
         if (test is null)
             return;
+        
+        if (waitingEnd)
+        {
+            g.DrawText(
+                new Rectangle(5, 5, g.Width - 10, g.Height - 10),
+                new Font("Arial", 140), 
+                StringAlignment.Center, StringAlignment.Center,
+                "Aguardando..."
+            );
+            g.DrawText(
+                new Rectangle(5, g.Height - 200, g.Width - 10, 200),
+                new Font("Arial", 20), 
+                StringAlignment.Center, StringAlignment.Center,
+                """
+                Segure o espaço para finalizar a prova com antecedência.
+                Aperte F para voltar a realizar a prova.
+                Ficar mais de 3 minutos na tela de "aguardando..." impossibilitará você
+                de voltar a fazer a prova.
+                """
+            );
+            timeCheck();
+            return;
+        }
         
         while (current < 0)
             current += test.PraticalTests.Count;
@@ -289,6 +343,7 @@ class PraticalView(
             if (DateTime.Now > testFinal)
             {
                 App.Pop();
+                App.Push(new DebugTest(test, answers, bestResult));
             }
         }
     }

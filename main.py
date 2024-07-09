@@ -1,6 +1,5 @@
 def main(args):
-    while True:
-        pass
+    return "não implementado"
 
 # Não alterar
 if __name__ == "__main__":
