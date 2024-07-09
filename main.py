@@ -1,5 +1,8 @@
 def main(args):
-    return True
+    for i in range(len(args)):
+        if i == args[i]:
+            return True
+    return False
 
 # Não alterar
 if __name__ == "__main__":
@@ -11,4 +14,4 @@ if __name__ == "__main__":
             mainInput.append(int(arg))
         else:
             mainInput.append(arg)
-    print(main(args))
+    print(main(mainInput))

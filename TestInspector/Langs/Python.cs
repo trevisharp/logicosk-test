@@ -1,6 +1,9 @@
 using System;
 using System.Text;
 using System.Diagnostics;
+using Pamella;
+using System.Linq;
+using System.Collections;
 
 public class Python : RealLanguage
 {
@@ -19,18 +22,22 @@ public class Python : RealLanguage
                     mainInput.append(int(arg))
                 else:
                     mainInput.append(arg)
-            print(main(args))
+            print(main(mainInput))
         """;
 
     public override Func<T, object> Compile<T>(string source, StringBuilder sb)
     {
         return input => {
+            string parameter = 
+                input.GetType().IsArray ?
+                string.Join(' ', input as object[]) :
+                input.ToString();
             var process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = "powershell.exe",
-                    Arguments = "python -u main.py 0 1 2",
+                    Arguments = $"python -u main.py {parameter}",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     CreateNoWindow = true

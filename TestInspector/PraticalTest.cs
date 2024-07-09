@@ -24,6 +24,7 @@ class PraticalView(
     int page = 0;
     DateTime testFinal;
     int spacing = 22;
+    int loading = -1;
     protected override void OnStart(IGraphics g)
     {
         g.UnsubscribeKeyDownEvent(oldDown);
@@ -83,6 +84,9 @@ class PraticalView(
                     break;
                 
                 case Input.Space:
+                    if (loading != -1)
+                        return;
+                    loading = 0;
                     var pratical = test.PraticalTests[current % test.PraticalTests.Count];
                     var compiler = Language.New(pratical.Language);
                     
@@ -96,8 +100,10 @@ class PraticalView(
                         return;
                     
                     int corrects = 0;
+                    var testList = pratical?.Tests ?? [];
+                    var testCount = int.Max(testList.Count, 1);
                     await Task.Run(() =>
-                        Parallel.ForEach(pratical?.Tests ?? [], test =>
+                        Parallel.ForEach(testList, test =>
                         {
                             StringBuilder testInfo = new StringBuilder();
                             if (test.Hidden)
@@ -125,6 +131,8 @@ class PraticalView(
                                             .ToArray()
                                         );
                                 }
+                                Interlocked.Add(ref loading, 50 / testCount);
+
                                 if (!test.Hidden)
                                     testInfo.AppendLine($"Saida: {output}.");
                                 
@@ -148,9 +156,13 @@ class PraticalView(
                                 {
                                     runInfo.AppendLine(testInfo.ToString());
                                 }
+                                Interlocked.Add(ref loading, 50 / testCount);
                             }
                         })
                     );
+                    loading = -1;
+                    runInfo.AppendLine();
+                    runInfo.AppendLine("Testes completos...");
                     lastResult[pratical] = runInfo.ToString();
 
                     float pontuation = corrects / (float)pratical.Tests.Count;
@@ -240,6 +252,7 @@ class PraticalView(
                 Brushes.LightCoral,
                 $"""
                 Melhor Nota Obtida: {100 * bestResult[pratical]}%
+                {(loading == -1 ? string.Empty : loading.ToString() + "%")}
                 
                 Edite o arquivo main.{pratical.Language} e pressione espaço para executar o código.
                 """
