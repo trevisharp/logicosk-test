@@ -27,6 +27,7 @@ class PraticalView(
     bool waitingEnd = false;
     DateTime waitingTime = DateTime.MaxValue;
     DateTime spaceTime = DateTime.MaxValue;
+    Action<Input> ev;
 
     protected override void OnStart(IGraphics g)
     {
@@ -47,7 +48,7 @@ class PraticalView(
 
         testFinal = DateTime.Now.AddMinutes(test.MinutesDuration);
 
-        g.SubscribeKeyDownEvent(async key => {
+        g.SubscribeKeyDownEvent(ev =async key => {
             
             switch (key)
             {
@@ -202,7 +203,7 @@ class PraticalView(
         if (time.TotalSeconds > 2f)
         {
             App.Clear();
-            App.Push(new DebugTest(results));
+            App.Push(new DebugTest(results, ev));
         }
     }
 
@@ -342,7 +343,7 @@ class PraticalView(
             if (DateTime.Now > testFinal)
             {
                 App.Pop();
-                App.Push(new DebugTest(results));
+                App.Push(new DebugTest(results, ev));
             }
         }
     }

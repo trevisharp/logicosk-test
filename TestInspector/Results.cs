@@ -21,10 +21,14 @@ public class Results
             }
         }
 
+        for (int i = 1; i < 14; i += 2)
+            if (aspects[i] == 0)
+                aspects[i] = 1;
+
         return new() {
             PureLogicAndMathAspect = (int)(1000 * aspects[0] / aspects[1]),
             LowLevelProgrammingAndDataStructureAspect = (int)(1000 * aspects[2] / aspects[3]),
-            ModernObjectOerientedAndFuncionalLanguagesAspect = (int)(1000 * aspects[4] / aspects[5]),
+            ModernObjectOrientedAndFuncionalLanguagesAspect = (int)(1000 * aspects[4] / aspects[5]),
             FrontendDevelopmentAspect = (int)(1000 * aspects[6] / aspects[7]),
             NetwordAndSecurityAspect = (int)(1000 * aspects[8] / aspects[9]),
             SoftwareEngineeringAndQualityAspect = (int)(1000 * aspects[10] / aspects[11]),
@@ -39,7 +43,7 @@ public class Grade
 {
     public int PureLogicAndMathAspect { get; init; }
     public int LowLevelProgrammingAndDataStructureAspect { get; init; }
-    public int ModernObjectOerientedAndFuncionalLanguagesAspect { get; init; }
+    public int ModernObjectOrientedAndFuncionalLanguagesAspect { get; init; }
     public int FrontendDevelopmentAspect { get; init; }
     public int NetwordAndSecurityAspect { get; init;}
     public int SoftwareEngineeringAndQualityAspect { get; init; }
@@ -47,14 +51,14 @@ public class Grade
     public int PraticalAspect { get; init; }
     public int BugfixAspect { get; init; }
 
-    public int Rating =>
-        70 * PureLogicAndMathAspect / 1000 + 
-        70 * LowLevelProgrammingAndDataStructureAspect / 1000 + 
-        70 * ModernObjectOerientedAndFuncionalLanguagesAspect / 1000 + 
-        70 * FrontendDevelopmentAspect / 1000 + 
-        70 * NetwordAndSecurityAspect / 1000 + 
-        70 * SoftwareEngineeringAndQualityAspect / 1000 + 
-        70 * AIMachineLearningAndDeepLearningAspect / 1000 + 
-        300 * PraticalAspect / 1000 +
-        210 * BugfixAspect / 1000;
+    public float Rating =>
+        70 * PureLogicAndMathAspect / 1000f + 
+        70 * LowLevelProgrammingAndDataStructureAspect / 1000f + 
+        70 * ModernObjectOrientedAndFuncionalLanguagesAspect / 1000f + 
+        70 * FrontendDevelopmentAspect / 1000f + 
+        70 * NetwordAndSecurityAspect / 1000f + 
+        70 * SoftwareEngineeringAndQualityAspect / 1000f + 
+        70 * AIMachineLearningAndDeepLearningAspect / 1000f + 
+        300 * PraticalAspect / 1000f +
+        210 * BugfixAspect / 1000f;
 }

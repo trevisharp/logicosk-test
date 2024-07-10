@@ -1,15 +1,24 @@
+using System;
 using System.Drawing;
 
 using Pamella;
 
 public class DebugTest(
-    Results results
+    Results results,
+    Action<Input> oldEvent
     ) : View
 {
     protected override void OnStart(IGraphics g)
     {
-        App.Pop();
-        App.Push(new ResultView(results));
+        g.UnsubscribeKeyDownEvent(oldEvent);
+        g.SubscribeKeyDownEvent(key =>
+        {
+            if (key != Input.Escape)
+                return;
+            
+            App.Pop();
+            App.Push(new ResultView(results));
+        });
     }
 
     protected override void OnRender(IGraphics g)
