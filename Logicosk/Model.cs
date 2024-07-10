@@ -42,6 +42,6 @@ public record BugfixTest(
     int Level,
     string Language,
     List<string> BaseCode,
-    string View,
-    List<object> ViewParams
+    string Lab,
+    List<string> LabParams
 );

@@ -1,12 +1,6 @@
 using System;
 using System.IO;
 using System.Text;
-using System.Linq;
-using System.Reflection;
-using System.Collections.Generic;
-
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 
 public abstract class PseudoLanguage : Language
 {
@@ -24,7 +18,7 @@ public abstract class PseudoLanguage : Language
             return null;
         }
 
-        var assembly = compile(code, sb);
+        var assembly = Compiler.Compile(code, sb);
         if (sb.Length > 0)
         {
             sb.Insert(0, "Erros Semânticos encontrados:\n");
@@ -36,46 +30,5 @@ public abstract class PseudoLanguage : Language
         var defaultType = assembly.GetType("TestePratico");
         var mainCode = defaultType.GetMethod("main");
         return x => mainCode.Invoke(null, [x]);
-    }
-
-    Assembly compile(string code, StringBuilder messages)
-    {
-        var compilationOptions = new CSharpCompilationOptions(
-            OutputKind.ConsoleApplication
-        );
-
-        var compilation = CSharpCompilation.Create(
-            "HotReloadAppend",
-            syntaxTrees: [CSharpSyntaxTree.ParseText(code)],
-            references: getReferences(),
-            options: compilationOptions
-        );
-
-        using var ms = new MemoryStream();
-        var result = compilation.Emit(ms);
-
-        if (!result.Success)
-        {
-            foreach (var diagnostic in result.Diagnostics)
-                messages.AppendLine(diagnostic.GetMessage());
-            return null;
-        }
-        
-        ms.Seek(0, SeekOrigin.Begin);
-        var assembly = Assembly.Load(ms.ToArray());
-        return assembly;
-    }
-
-    IEnumerable<MetadataReference> getReferences()
-    {
-        var assembly = Assembly.GetEntryAssembly();
-        var assemblies = assembly
-            .GetReferencedAssemblies()
-            .Select(r => Assembly.Load(r))
-            .Append(assembly)
-            .Append(Assembly.Load("System.Private.CoreLib"));
-        
-        return assemblies
-            .Select(r => MetadataReference.CreateFromFile(r.Location));
     }
 }
