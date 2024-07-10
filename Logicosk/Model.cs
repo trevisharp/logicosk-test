@@ -6,7 +6,8 @@ public record Test(
     string ResourceFolder,
     int MinutesDuration,
     List<Question> Questions,
-    List<PraticalTest> PraticalTests
+    List<PraticalTest> PraticalTests,
+    List<BugfixTest> BugfixTests
 );
 
 public record Alternative(
@@ -34,4 +35,13 @@ public record PraticalTest(
     bool Esoteric,
     string Language,
     List<AutoTest> Tests
+);
+
+public record BugfixTest(
+    string Description,
+    int Level,
+    string Language,
+    List<string> BaseCode,
+    string View,
+    List<object> ViewParams
 );
