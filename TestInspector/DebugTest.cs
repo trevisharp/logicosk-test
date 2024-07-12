@@ -6,7 +6,6 @@ using System.Drawing;
 using Pamella;
 using Logicosk;
 using System.Text;
-using System.Collections.Generic;
 
 public class DebugTest(
     Results results,
@@ -15,11 +14,13 @@ public class DebugTest(
 {
     Test test = results.Test;
     Lab lab;
-    float[] grades = [ 0f, 0f, 0f, 0f, 0f, 0f ];
-    int level = 0;
+    float[] grades;
+    int level;
 
     protected override void OnStart(IGraphics g)
     {
+        level = 0;
+        results.LevelAvaliations = grades = new float[results.Test.BugfixTests.Count];
         var bugFix = test.BugfixTests.FirstOrDefault();
         var lang = Language.New(bugFix.Language);
         lab = Lab.New(bugFix.Lab);

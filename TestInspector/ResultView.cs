@@ -8,8 +8,8 @@ public class ResultView(Results results) : View
 {
     int desloc = 24;
     Grade grade = results.GenerateGrade();
-    List<int> gradeAnimation = [ 0, 0, 0, 0, 0, 0, 0 ];
-    List<int> maxGradeAnimation = [ 0, 0, 0, 0, 0, 0, 0 ];
+    List<float> gradeAnimation = [ 0, 0, 0, 0, 0, 0, 0 ];
+    List<float> maxGradeAnimation = [ 0, 0, 0, 0, 0, 0, 0 ];
     List<string> teoricalAspects = [
         "                           A1: Pure Logic and Math:",
         "     A2: Low-Level Programming and Data Structures:",
@@ -19,9 +19,13 @@ public class ResultView(Results results) : View
         "              A6: Software Engineering and Quality:",
         "        A7: AI, Machine Learning and Deep Learning:"
     ];
-    int praticalGrade = 0;
-    int maxPraticalGrade;
+    float praticalGrade = 0;
+    float maxPraticalGrade;
+    float bugFixGrade = 0;
+    float maxbugFixGrade;
+    float finalGrade = 0;
     string praticalBar = "";
+    string bugFixBar = "";
     List<Brush> colors = [ 
         Brushes.Black, Brushes.Black, Brushes.Black,
         Brushes.Black, Brushes.Black, Brushes.Black,
@@ -45,6 +49,7 @@ public class ResultView(Results results) : View
             grade.AIMachineLearningAndDeepLearningAspect
         ];
         maxPraticalGrade = grade.PraticalAspect;
+        maxbugFixGrade = grade.BugfixAspect;
         colors = [
             Brushes.DarkBlue,
             Brushes.BlueViolet,
@@ -99,7 +104,7 @@ public class ResultView(Results results) : View
             g.DrawText(
                 new RectangleF(9 * part + 5, 55 + i * desloc, part - 10, desloc),
                 new Font("Monospace", 20f), StringAlignment.Center,
-                StringAlignment.Center, colors[i], gradeAnimation[i].ToString()
+                StringAlignment.Center, colors[i], ((int)gradeAnimation[i]).ToString()
             );
         }
         int questionEnd = 55 + 7 * desloc + desloc;
@@ -119,24 +124,72 @@ public class ResultView(Results results) : View
         g.DrawText(
             new RectangleF(9 * part + 5, praticalStart, part - 10, 3 * desloc / 2),
             new Font("Monospace", 20f), StringAlignment.Center,
-            StringAlignment.Center, Brushes.DarkGreen, praticalGrade.ToString()
+            StringAlignment.Center, Brushes.DarkGreen, ((int)praticalGrade).ToString()
         );
         int praticalEnd = praticalStart + 3 * desloc / 2 + 5;
         g.FillRectangle(20, praticalEnd + 1, g.Width - 40, 3, Brushes.Black);
-        
+
+        int bugFixStart = praticalEnd + 9;
+        g.DrawText(
+            new RectangleF(5, bugFixStart, 4 * part - 10, 3 * desloc / 2),
+            new Font("Monospace", 30f), StringAlignment.Far,
+            StringAlignment.Center, Brushes.DarkGreen, "Resultado do Bugfix:"
+        );
+        g.DrawText(
+            new RectangleF(4 * part + 5, bugFixStart, 5 * part - 10, 3 * desloc / 2),
+            new Font("Monospace", 20f), StringAlignment.Near,
+            StringAlignment.Center, Brushes.DarkGreen, bugFixBar
+        );
+        g.DrawText(
+            new RectangleF(9 * part + 5, bugFixStart, part - 10, 3 * desloc / 2),
+            new Font("Monospace", 20f), StringAlignment.Center,
+            StringAlignment.Center, Brushes.DarkGreen, ((int)bugFixGrade).ToString()
+        );
+        int bugFixEnd = bugFixStart + 3 * desloc / 2 + 5;
+        g.FillRectangle(20, bugFixEnd + 1, g.Width - 40, 3, Brushes.Black);
+
+        int finalStart = bugFixEnd + 9;
+        g.DrawText(
+            new RectangleF(5, finalStart, g.Width - 10, 40),
+            new Font("Monospace", 30f), StringAlignment.Center,
+            StringAlignment.Center, Brushes.DarkGreen, "Resultado Final:"
+        );
+        int gradeSize = (g.Height - 50 - finalStart) / 2;
+        g.DrawText(
+            new RectangleF(5, finalStart, g.Width - 10, gradeSize),
+            new Font("Monospace", 120f), StringAlignment.Center,
+            StringAlignment.Center, Brushes.DarkGreen, ((int)finalGrade).ToString()
+        );
+        int classStart = finalStart += gradeSize;
+        g.DrawText(
+            new RectangleF(5, classStart, g.Width - 10, gradeSize),
+            new Font("Monospace", 120f), StringAlignment.Center,
+            StringAlignment.Center, Brushes.DarkGreen, finalGrade switch
+            {
+                <50 => "F",   
+                >=050 and <150 => "E",   
+                >=150 and <300 => "D",   
+                >=300 and <500 => "C",   
+                >=500 and <700 => "B",   
+                >=700 and <850 => "A",   
+                >=850 and <950 => "S",   
+                _ => "L",   
+            }
+        );
         
     }
 
     void onTick()
     {
-        int[] sums = [ 
-            grade.PureLogicAndMathAspect / 20,
-            grade.LowLevelProgrammingAndDataStructureAspect / 20,
-            grade.ModernObjectOrientedAndFuncionalLanguagesAspect / 20,
-            grade.FrontendDevelopmentAspect / 20,
-            grade.NetwordAndSecurityAspect / 20,
-            grade.SoftwareEngineeringAndQualityAspect / 20,
-            grade.AIMachineLearningAndDeepLearningAspect / 20
+        const float div = 50;
+        float[] sums = [ 
+            grade.PureLogicAndMathAspect / div,
+            grade.LowLevelProgrammingAndDataStructureAspect / div,
+            grade.ModernObjectOrientedAndFuncionalLanguagesAspect / div,
+            grade.FrontendDevelopmentAspect / div,
+            grade.NetwordAndSecurityAspect / div,
+            grade.SoftwareEngineeringAndQualityAspect / div,
+            grade.AIMachineLearningAndDeepLearningAspect / div
         ];
 
         for (int i = 0; i < 7; i++)
@@ -145,18 +198,36 @@ public class ResultView(Results results) : View
             if (gradeAnimation[i] > maxGradeAnimation[i])
                 gradeAnimation[i] = maxGradeAnimation[i];
 
-            int barCount = (int)(gradeAnimation[i] / 12.5);
-            bars[i] = string.Concat(Enumerable.Repeat("█ ", barCount / 2)) 
+            float barCount = gradeAnimation[i] / 12.5f;
+            bars[i] = string.Concat(Enumerable.Repeat("█ ", (int)(barCount / 2))) 
                 + (barCount % 2 == 1 ? "▌" : "");
         }
 
-        int psum = grade.PraticalAspect / 20;
+        // Pratical Bar
+        float psum = grade.PraticalAspect / div;
         praticalGrade += psum;
         if (praticalGrade > maxPraticalGrade)
             praticalGrade = maxPraticalGrade;
 
-        int pbarCount = (int)(praticalGrade / 12.5);
-        praticalBar = string.Concat(Enumerable.Repeat("█ ", pbarCount / 2)) 
+        float pbarCount = praticalGrade / 12.5f;
+        praticalBar = string.Concat(Enumerable.Repeat("█ ", (int)(pbarCount / 2))) 
             + (pbarCount % 2 == 1 ? "▌" : "");
+
+        // Bugfix Bar
+        float bsum = grade.BugfixAspect / div;
+        bugFixGrade += bsum;
+        if (bugFixGrade > maxbugFixGrade)
+            bugFixGrade = maxbugFixGrade;
+
+        float bbarCount = bugFixGrade / 12.5f;
+        bugFixBar = string.Concat(Enumerable.Repeat("█ ", (int)(bbarCount / 2))) 
+            + (bbarCount % 2 == 1 ? "▌" : "");
+        
+        // Final Grade
+        float rating = grade.Rating;
+        float fsum = rating / div;
+        finalGrade += fsum;
+        if (finalGrade > rating)
+            finalGrade = rating;
     }
 }

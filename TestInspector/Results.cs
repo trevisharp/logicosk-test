@@ -5,8 +5,9 @@ using Logicosk;
 public class Results
 {
     public Test Test { get; set; }
-    public Dictionary<Question, Alternative> Answers { get; set; } = new();
-    public Dictionary<PraticalTest, float> BestResults { get; set; } = new();
+    public Dictionary<Question, Alternative> Answers { get; set; } = [];
+    public Dictionary<PraticalTest, float> BestResults { get; set; } = [];
+    public float[] LevelAvaliations { get; set; } = [];
     public Grade GenerateGrade()
     {
         float[] aspects = new float[14];
@@ -33,7 +34,7 @@ public class Results
             SoftwareEngineeringAndQualityAspect = (int)(1000 * aspects[10] / aspects[11]),
             AIMachineLearningAndDeepLearningAspect = (int)(1000 * aspects[12] / aspects[13]),
             PraticalAspect = (int)(1000 * BestResults.Values.Average()),
-            BugfixAspect = 0
+            BugfixAspect = (int)(1000 * LevelAvaliations.Average())
         };
     }
 }
@@ -50,7 +51,7 @@ public class Grade
     public int PraticalAspect { get; init; }
     public int BugfixAspect { get; init; }
 
-    public float Rating =>
+    public int Rating => (int)(
         70 * PureLogicAndMathAspect / 1000f + 
         70 * LowLevelProgrammingAndDataStructureAspect / 1000f + 
         70 * ModernObjectOrientedAndFuncionalLanguagesAspect / 1000f + 
@@ -59,5 +60,5 @@ public class Grade
         70 * SoftwareEngineeringAndQualityAspect / 1000f + 
         70 * AIMachineLearningAndDeepLearningAspect / 1000f + 
         300 * PraticalAspect / 1000f +
-        210 * BugfixAspect / 1000f;
+        210 * BugfixAspect / 1000f);
 }
