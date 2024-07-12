@@ -4,9 +4,9 @@ using System.Drawing;
 using System.Collections.Generic;
 
 using Pamella;
-using Logicosk;
+using System.Windows.Forms;
 
-public class Planetary(Language lang) : Lab
+public class Planetary : Lab
 {
     public class Planet
     {
@@ -20,9 +20,11 @@ public class Planetary(Language lang) : Lab
     }
 
     List<Planet> planets = [];
+    List<string> originalArgs = [];
     int speed = 60 * 60 * 100;
     public override void LoadParams(List<string> args)
     {
+        originalArgs = args;
         foreach (var arg in args)
         {
             var data = arg.Split(" ");
@@ -119,7 +121,12 @@ public class Planetary(Language lang) : Lab
 
     public override void LoadBehaviour(Type code)
     {
+        var method = code.GetMethod("dist");
+        if (method is null)
+            return;
         
+        dist = (xp, yp, xq, yq) =>
+            method.Invoke(null, [xp, yp, xq, yq]);
     }
 
     Planet earth(float x0, float y0, float vx0, float vy0)
@@ -143,4 +150,10 @@ public class Planetary(Language lang) : Lab
             VelY = vy0,
             Radius = 1.7374e6f
         };
+
+    public override void Reset()
+    {
+        planets.Clear();
+        LoadParams(originalArgs);
+    }
 }

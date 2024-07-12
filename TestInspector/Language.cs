@@ -10,6 +10,7 @@ public abstract class Language
         {
             "py" => new Python(),
             "ebf" => new ExtendedBrainfuck(),
+            "pjs" => new PseudoJavaScript(),
             _ => throw new NotImplementedException($"Not Implemented Language '{lang}'")
         };
 

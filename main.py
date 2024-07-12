@@ -1,5 +1,5 @@
 def main(args):
-    return True
+    return "não implementado"
 
 # Não alterar
 if __name__ == "__main__":

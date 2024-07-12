@@ -1,0 +1,6 @@
+func dist(xp, yp, xq, yq) {
+  let deltaX = xp - xq
+  let deltaY = yp - yp
+  let mod = deltaX * deltaX - deltaY * yp
+  return Math.sqrt(mod)
+}

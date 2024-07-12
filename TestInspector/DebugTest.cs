@@ -5,6 +5,7 @@ using System.Drawing;
 
 using Pamella;
 using Logicosk;
+using System.Text;
 
 public class DebugTest(
     Results results,
@@ -18,7 +19,7 @@ public class DebugTest(
     {
         var bugFix = test.BugfixTests.FirstOrDefault();
         var lang = Language.New(bugFix.Language);
-        lab = Lab.New(bugFix.Lab, lang);
+        lab = Lab.New(bugFix.Lab);
         lab.LoadParams(bugFix.LabParams);
         var file = $"main.{bugFix.Language}";
         var code = string.Join('\n', bugFix.BaseCode);
@@ -33,7 +34,16 @@ public class DebugTest(
             switch (key)
             {
                 case Input.Space:
-                    code = File.ReadAllText(file);
+                    var sb = new StringBuilder();
+                    var assembly = lang.CompileAssembly(file, sb);
+                    if (assembly is null)
+                    {
+                        System.Windows.Forms.MessageBox.Show(sb.ToString());
+                        return;
+                    }
+                    var type = assembly.GetType("TestePratico");
+                    lab.Reset();
+                    lab.LoadBehaviour(type);
                     break;
             }
 

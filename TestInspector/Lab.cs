@@ -5,10 +5,10 @@ using Pamella;
 
 public abstract class Lab
 {
-    public static Lab New(string name, Language lang) =>
+    public static Lab New(string name) =>
         name switch
         {
-            "planetary" => new Planetary(lang),
+            "planetary" => new Planetary(),
             _ => throw new NotImplementedException($"unknown lab '{name}'.")
         };
 
@@ -16,4 +16,5 @@ public abstract class Lab
     public abstract void LoadBehaviour(Type code);
     public abstract void Draw(IGraphics g);
     public abstract void Interact(float dt);
+    public abstract void Reset();
 }
