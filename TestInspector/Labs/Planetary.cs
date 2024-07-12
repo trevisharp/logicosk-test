@@ -38,10 +38,14 @@ public class Planetary : Lab
             }
             
             if (data is [ "custom", "dist" ])
+            {
                 dist = null;
+                customDist = true;
+            }
         }
     }
 
+    bool customDist = false;
     Func<dynamic, dynamic, dynamic, dynamic, dynamic> dist = (xp, yp, xq, yq) =>
     {
         var deltaX = xp - xq;
@@ -121,11 +125,9 @@ public class Planetary : Lab
     public override void LoadBehaviour(Type code)
     {
         var method = code.GetMethod("dist");
-        if (method is null)
-            return;
-        
-        dist = (xp, yp, xq, yq) =>
-            method.Invoke(null, [xp, yp, xq, yq]);
+        if (customDist && method is not null)
+            dist = (xp, yp, xq, yq) =>
+                method.Invoke(null, [xp, yp, xq, yq]);
     }
 
     Planet earth(float x0, float y0, float vx0, float vy0)
