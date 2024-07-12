@@ -30,11 +30,6 @@ class QuestionsView(Results results, Action<Input> oldEvent) : View
 
         AlwaysInvalidateMode();
         g.SubscribeKeyDownEvent(oldKeyEventDown = key => {
-            if (key == Input.Escape && escTime == DateTime.MaxValue)
-                escTime = DateTime.Now;
-
-            if (key == Input.Space && spaceTime == DateTime.MaxValue && waitingEnd)
-                spaceTime = DateTime.Now;
 
             if (test is null)
                 return;
@@ -107,6 +102,12 @@ class QuestionsView(Results results, Action<Input> oldEvent) : View
 
 
                 case Input.Space:
+                    if (spaceTime == DateTime.MaxValue && waitingEnd)
+                        spaceTime = DateTime.Now;
+                    
+                    if (waitingEnd)
+                        return;
+
                     var question = test.Questions[current];
                     var awnser = question.Alternatives[selected];
 
@@ -118,9 +119,6 @@ class QuestionsView(Results results, Action<Input> oldEvent) : View
 
         });
         g.SubscribeKeyUpEvent(oldKeyEventUp = key => {
-            if (key == Input.Escape)
-                escTime = DateTime.MaxValue;
-            
             if (key == Input.Space)
                 spaceTime = DateTime.MaxValue;
         });
@@ -128,11 +126,7 @@ class QuestionsView(Results results, Action<Input> oldEvent) : View
 
     protected override void OnFrame(IGraphics g)
     {
-        var time = DateTime.Now - escTime;
-        if (time.TotalSeconds > 2f)
-            App.Close();
-        
-        time = DateTime.Now - spaceTime;
+        var time = DateTime.Now - spaceTime;
         if (time.TotalSeconds > 2f)
         {
             App.Clear();
