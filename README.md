@@ -30,12 +30,15 @@ Test of logic and computational skills questions repository.
 
 ## Grade
 
-Final grade = (A1 + A2 + A2) / 3 (Between 0 and 1000)
+Final grade = 0.49 * S1 + 0.3 * S2 + 0.s1 * S3
 
 ## Classification
-  
-  - S
-  - A
-  - B
-  - C
-  - D
+
+  - >=000 and <050 => F,
+  - >=050 and <150 => E,
+  - >=150 and <300 => D,
+  - >=300 and <500 => C,
+  - >=500 and <700 => B,
+  - >=700 and <850 => A,
+  - >=850 and <950 => S,
+  - >=950 and <=1000 => L,

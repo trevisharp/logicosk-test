@@ -1,6 +1,0 @@
-func dist(xp, yp, xq, yq) {
-  let distanceInX = xp - xq
-  let distanceInY = yp - yq
-  let mod = distanceInX * distanceInX + distanceInY * distanceInY
-  return Math.sqrt(mod)
-}

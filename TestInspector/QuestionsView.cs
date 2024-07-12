@@ -15,7 +15,6 @@ class QuestionsView(Results results, Action<Input> oldEvent) : View
     bool waitingEnd = false;
     int jump = 80;
     int spacing = 60;
-    DateTime escTime = DateTime.MaxValue;
     DateTime spaceTime = DateTime.MaxValue;
     DateTime testFinal;
     DateTime waitingTime = DateTime.MaxValue;
