@@ -1,10 +1,11 @@
 using System;
-using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
+using System.Drawing;
+using System.Collections.Generic;
+
 using Pamella;
 
-public class ResultView(Results results) : View
+public class ResultView(Results results, Action<Input> oldKeyEvent) : View
 {
     int desloc = 24;
     Grade grade = results.GenerateGrade();
@@ -38,6 +39,7 @@ public class ResultView(Results results) : View
     int lastTick = -1;
     protected override void OnStart(IGraphics g)
     {
+        g.UnsubscribeKeyDownEvent(oldKeyEvent);
         animationStart = DateTime.Now;
         maxGradeAnimation = [
             grade.PureLogicAndMathAspect,

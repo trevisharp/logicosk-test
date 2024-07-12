@@ -1,11 +1,11 @@
 using System;
 using System.IO;
+using System.Text;
 using System.Drawing;
+using System.Collections.Generic;
 
 using Pamella;
 using Logicosk;
-using System.Text;
-using System.Collections.Generic;
 
 public class DebugTest(
     Results results,
@@ -19,11 +19,20 @@ public class DebugTest(
     float[] grades;
     int level;
     bool helpView = false;
+    bool waitingEnd = false;
+    DateTime last = DateTime.Now;
+    DateTime waitingTime;
+    DateTime spaceTime;
+    Action<Input> oldKeyEvent;
+    private DateTime testFinal;
 
     protected override void OnStart(IGraphics g)
     {
         level = 0;
         results.LevelAvaliations = grades = new float[results.Test.BugfixTests.Count];
+        testFinal = DateTime.Now.Add(
+            TimeSpan.FromMinutes(test.MinutesDuration)
+        );
 
         int index = 0;
         foreach (var bugFix in test.BugfixTests)
@@ -45,11 +54,17 @@ public class DebugTest(
 
         if (oldEvent is not null)
             g.UnsubscribeKeyDownEvent(oldEvent);
-        g.SubscribeKeyDownEvent(key =>
+        g.SubscribeKeyDownEvent(oldKeyEvent = key =>
         {
             switch (key)
             {
                 case Input.Space:
+                    if (spaceTime == DateTime.MaxValue && waitingEnd)
+                        spaceTime = DateTime.Now;
+                    
+                    if (waitingEnd)
+                        return;
+
                     var sb = new StringBuilder();
                     var assembly = langs[level].CompileAssembly(files[level], sb);
                     if (assembly is null)
@@ -64,19 +79,79 @@ public class DebugTest(
                     if (grade > grades[level])
                         grades[level] = grade;
                     break;
+                
+
+                case Input.H:
+                    helpView = !helpView;
+                    break;
+                
+
+                case Input.F:
+                    if (waitingEnd)
+                    {
+                        var totalWaitingTime = DateTime.Now - waitingTime;
+                        if (totalWaitingTime.TotalMinutes > 3)
+                            break;
+                    }
+                    waitingTime = DateTime.Now;
+                    waitingEnd = !waitingEnd;
+                    break;
+                
+
+                case Input.Left:
+                    level--;
+                    if (level < 0)
+                        level = test.BugfixTests.Count - 1;
+                    break;
+                
+                
+                case Input.Right:
+                    level++;
+                    if (level >= test.BugfixTests.Count)
+                        level = 0;
+                    break;
             }
-
-            if (key != Input.Escape)
-                return;
-
-            App.Pop();
-            App.Push(new ResultView(results));
         });
     }
 
-    DateTime last = DateTime.Now;
+    protected override void OnFrame(IGraphics g)
+    {
+        var time = DateTime.Now - spaceTime;
+        if (time.TotalSeconds > 2f && waitingEnd)
+        {
+            App.Pop();
+            App.Push(new ResultView(results, oldKeyEvent));
+        }
+    }
+
     protected override void OnRender(IGraphics g)
     {
+        if (results is null)
+            return;
+        
+        if (waitingEnd)
+        {
+            g.DrawText(
+                new Rectangle(5, 5, g.Width - 10, g.Height - 10),
+                new Font("Arial", 140), 
+                StringAlignment.Center, StringAlignment.Center,
+                "Aguardando..."
+            );
+            g.DrawText(
+                new Rectangle(5, g.Height - 200, g.Width - 10, 200),
+                new Font("Arial", 20), 
+                StringAlignment.Center, StringAlignment.Center,
+                """
+                Segure o espaço para finalizar a prova com antecedência.
+                Aperte F para voltar a realizar a prova.
+                Ficar mais de 3 minutos na tela de "aguardando..." impossibilitará você
+                de voltar a fazer a prova.
+                """
+            );
+            timeCheck();
+            return;
+        }
+
         var now = DateTime.Now;
         var time = now - last;
         last = now;
@@ -115,5 +190,30 @@ public class DebugTest(
             Brushes.White, 
             $"Pressione h para ver a tela de ajuda..."
         );
+
+        timeCheck();
+
+        void timeCheck()
+        {
+            var timeFont = new Font("Arial", 16);
+            var remainingTime = testFinal - DateTime.Now;
+            g.DrawText(
+                new RectangleF(g.Width - 120, g.Height - 30, 120, 30),
+                timeFont, remainingTime.TotalMinutes switch
+                {
+                    <= 15 and > 5 => Brushes.Yellow,
+                    <= 5 and > 1 => Brushes.Orange,
+                    <= 1 => Brushes.Red,
+                    _ => Brushes.Black
+                },
+                $"{remainingTime.Hours:00}:{remainingTime.Minutes:00}:{remainingTime.Seconds:00}"
+            );
+
+            if (DateTime.Now > testFinal)
+            {
+                App.Pop();
+                App.Push(new ResultView(results, oldKeyEvent));
+            }
+        }
     }
 }
