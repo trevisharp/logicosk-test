@@ -22,7 +22,7 @@ public class DebugTest(
     bool waitingEnd = false;
     DateTime last = DateTime.Now;
     DateTime waitingTime;
-    DateTime spaceTime;
+    DateTime spaceTime = DateTime.MaxValue;
     Action<Input> oldKeyEvent;
     private DateTime testFinal;
 
@@ -126,6 +126,7 @@ public class DebugTest(
 
     protected override void OnRender(IGraphics g)
     {
+        g.Clear(Color.FromArgb(40, 10, 10));
         if (results is null)
             return;
         
@@ -135,7 +136,7 @@ public class DebugTest(
                 new Rectangle(5, 5, g.Width - 10, g.Height - 10),
                 new Font("Arial", 140), 
                 StringAlignment.Center, StringAlignment.Center,
-                "Aguardando..."
+                Brushes.White, "Aguardando..."
             );
             g.DrawText(
                 new Rectangle(5, g.Height - 200, g.Width - 10, 200),
@@ -157,7 +158,6 @@ public class DebugTest(
         last = now;
         var dt = (float)time.TotalSeconds;
 
-        g.Clear(Color.FromArgb(40, 10, 10));
         if (helpView)
         {
             g.DrawText(
