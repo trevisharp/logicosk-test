@@ -1,11 +1,12 @@
 using System;
+using System.Linq;
 using System.Drawing;
 using System.Collections.Generic;
 
 using Pamella;
-using System.Linq;
+using Logicosk;
 
-public class Planetary : Lab
+public class Planetary(Language lang) : Lab
 {
     public class Planet
     {
@@ -19,7 +20,7 @@ public class Planetary : Lab
     }
 
     List<Planet> planets = [];
-    int speed = 3600;
+    int speed = 60 * 60 * 100;
     public override void LoadParams(List<string> args)
     {
         foreach (var arg in args)
@@ -28,20 +29,15 @@ public class Planetary : Lab
             if (data.Length == 0)
                 return;
             
-            if (data[0] == "add")
-                add(data[1..]);
-        }
-
-        void add(string[] args)
-        {
-            if (args.Length == 0)
-                return;
-            
-            if (args[0] == "earth-moon")
+            if (data is [ "add", "earth-moon" ])
             {
                 planets.Add(earth(0, 0, 0, 0));
-                planets.Add(moon(384_400_000f, 0, 0, 1030));
+                planets.Add(moon(384.4e6f, 0, 0, 1.03e3f));
+                continue;
             }
+            
+            if (data is [ "custom", "dist" ])
+                dist = null;
         }
     }
 
@@ -49,12 +45,15 @@ public class Planetary : Lab
     {
         var deltaX = xp - xq;
         var deltaY = yp - yq;
-        var mod = deltaX * deltaX;
+        var mod = deltaX * deltaX + deltaY * deltaY;
         return MathF.Sqrt(mod);
     };
 
     public override void Interact(float dt)
     {
+        if (dist is null)
+            return;
+        
         dt *= speed;
         var pairs = 
             from p in planets
@@ -93,7 +92,11 @@ public class Planetary : Lab
         foreach (var planet in planets)
         {
             g.FillPolygon(
-                circle(cx + planet.X, cy + planet.Y, planet.Radius),
+                circle(
+                    cx + planet.X / 1000 / 1000,
+                    cy + planet.Y / 1000 / 1000,
+                    planet.Radius / 200 / 1000
+                ),
                 planet.Brush
             );
         }
@@ -102,16 +105,12 @@ public class Planetary : Lab
     PointF[] circle(float x, float y, float radius)
     {
         var pts = new List<PointF>();
-        float graphRadius = radius / 100 / 1000;
-
         for (int i = 0; i < 90; i++)
         {
             float angle = MathF.PI * 4 * i / 180;
-            float realX = x + MathF.Cos(angle) * graphRadius;
-            float realY = y + MathF.Sin(angle) * graphRadius;
             pts.Add(new PointF {
-                X = realX / 1000 / 1000,
-                Y = realY / 1000 / 1000
+                X = x + MathF.Cos(angle) * radius,
+                Y = y + MathF.Sin(angle) * radius
             });
         }
 
@@ -120,7 +119,7 @@ public class Planetary : Lab
 
     public override void LoadBehaviour(Type code)
     {
-
+        
     }
 
     Planet earth(float x0, float y0, float vx0, float vy0)

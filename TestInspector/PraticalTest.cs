@@ -48,7 +48,7 @@ class PraticalView(
 
         testFinal = DateTime.Now.AddMinutes(test.MinutesDuration);
 
-        g.SubscribeKeyDownEvent(ev =async key => {
+        g.SubscribeKeyDownEvent(ev = async key => {
             
             switch (key)
             {

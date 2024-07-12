@@ -1,9 +1,7 @@
 using System;
 using System.Text;
+using System.Reflection;
 using System.Diagnostics;
-using Pamella;
-using System.Linq;
-using System.Collections;
 using System.Threading.Tasks;
 
 public class Python : RealLanguage
@@ -64,4 +62,7 @@ public class Python : RealLanguage
             return output;
         };
     }
+
+    public override Assembly CompileAssembly(string source, StringBuilder sb)
+        => throw new Exception("Python can't be compiled to assembly type");
 }

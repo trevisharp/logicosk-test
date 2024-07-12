@@ -5,10 +5,10 @@ using Pamella;
 
 public abstract class Lab
 {
-    public static Lab New(string name) =>
+    public static Lab New(string name, Language lang) =>
         name switch
         {
-            "planetary" => new Planetary(),
+            "planetary" => new Planetary(lang),
             _ => throw new NotImplementedException($"unknown lab '{name}'.")
         };
 

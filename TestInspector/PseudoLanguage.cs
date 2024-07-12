@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Reflection;
 using System.Text;
 
 public abstract class PseudoLanguage : Language
@@ -9,6 +10,17 @@ public abstract class PseudoLanguage : Language
     public override string BaseCode => "";
 
     public override Func<T, object> Compile<T>(string source, StringBuilder sb)
+    {
+        var assembly = CompileAssembly(source, sb);
+        if (assembly is null)
+            return null;
+        
+        var defaultType = assembly.GetType("TestePratico");
+        var mainCode = defaultType.GetMethod("main");
+        return x => mainCode.Invoke(null, [x]);
+    }
+
+    public override Assembly CompileAssembly(string source, StringBuilder sb)
     {
         var code = File.ReadAllText(source);
         code = convert(code, sb);
@@ -24,11 +36,6 @@ public abstract class PseudoLanguage : Language
             sb.Insert(0, "Erros Semânticos encontrados:\n");
             return null;
         }
-        if (assembly is null)
-            return null;
-        
-        var defaultType = assembly.GetType("TestePratico");
-        var mainCode = defaultType.GetMethod("main");
-        return x => mainCode.Invoke(null, [x]);
+        return assembly;
     }
 }

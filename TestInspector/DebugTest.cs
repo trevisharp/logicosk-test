@@ -1,8 +1,10 @@
 using System;
-using System.Drawing;
+using System.IO;
 using System.Linq;
-using Logicosk;
+using System.Drawing;
+
 using Pamella;
+using Logicosk;
 
 public class DebugTest(
     Results results,
@@ -15,8 +17,12 @@ public class DebugTest(
     protected override void OnStart(IGraphics g)
     {
         var bugFix = test.BugfixTests.FirstOrDefault();
-        lab = Lab.New(bugFix.Lab);
+        var lang = Language.New(bugFix.Language);
+        lab = Lab.New(bugFix.Lab, lang);
         lab.LoadParams(bugFix.LabParams);
+        var file = $"main.{bugFix.Language}";
+        var code = string.Join('\n', bugFix.BaseCode);
+        File.WriteAllText(file, code);
 
         AlwaysInvalidateMode();
 
@@ -24,9 +30,16 @@ public class DebugTest(
             g.UnsubscribeKeyDownEvent(oldEvent);
         g.SubscribeKeyDownEvent(key =>
         {
+            switch (key)
+            {
+                case Input.Space:
+                    code = File.ReadAllText(file);
+                    break;
+            }
+
             if (key != Input.Escape)
                 return;
-            
+
             App.Pop();
             App.Push(new ResultView(results));
         });
