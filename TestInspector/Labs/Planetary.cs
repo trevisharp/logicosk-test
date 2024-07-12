@@ -4,7 +4,6 @@ using System.Drawing;
 using System.Collections.Generic;
 
 using Pamella;
-using System.Windows.Forms;
 
 public class Planetary : Lab
 {
@@ -156,4 +155,37 @@ public class Planetary : Lab
         planets.Clear();
         LoadParams(originalArgs);
     }
+
+    public override float Avaliate()
+    {
+        float points = 0;
+        assert(dist(1, 0, 0, 0), 1, ref points);
+        assert(dist(0, 1, 0, 0), 1, ref points);
+        assert(dist(0, 0, 1, 0), 1, ref points);
+        assert(dist(0, 0, 0, 1), 1, ref points);
+
+        assert(dist(0, 0, 0, 0), 0, ref points);
+        assert(dist(1, 1, 1, 1), 0, ref points);
+        assert(dist(1, 1, 0, 0), MathF.Sqrt(2), ref points);
+        assert(dist(0, 0, 1, 1), MathF.Sqrt(2), ref points);
+        
+        assert(dist(8, 0, -8, 0), 16, ref points);
+        assert(dist(0, -8, 0, 8), 16, ref points);
+        assert(dist(-6, 0, 0, -8), 10, ref points);
+        assert(dist(0, 8, 6, 0), 10, ref points);
+        
+        float result = MathF.Sqrt(100 * 100 + 44 * 44);
+        assert(dist(110, -6, 10, -50), result, ref points);
+        assert(dist(90, 148, 190, 104), result, ref points);
+        assert(dist(-50, 22, 50, -22), result, ref points);
+        assert(dist(20, 36, 120, 80), result, ref points);
+
+        return points / 16;
+    }
+
+    void assert(float expected, float result, ref float points)
+        => points += gauss(expected - result);
+
+    float gauss(float x)
+        => MathF.Exp(-x * x / 3);
 }

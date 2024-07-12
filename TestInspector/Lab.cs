@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-
+using System.Threading;
 using Pamella;
 
 public abstract class Lab
@@ -17,4 +17,5 @@ public abstract class Lab
     public abstract void Draw(IGraphics g);
     public abstract void Interact(float dt);
     public abstract void Reset();
+    public abstract float Avaliate();
 }

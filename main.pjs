@@ -1,6 +1,6 @@
 func dist(xp, yp, xq, yq) {
-  let deltaX = xp - xq
-  let deltaY = yp - yp
-  let mod = deltaX * deltaX - deltaY * yp
+  let distanceInX = xp - xq
+  let distanceInY = yp - yq
+  let mod = distanceInX * distanceInX + distanceInY * distanceInY
   return Math.sqrt(mod)
 }
