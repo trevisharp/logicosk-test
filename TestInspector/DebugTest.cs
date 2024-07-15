@@ -142,6 +142,7 @@ public class DebugTest(
                 new Rectangle(5, g.Height - 200, g.Width - 10, 200),
                 new Font("Arial", 20), 
                 StringAlignment.Center, StringAlignment.Center,
+                Brushes.White,
                 """
                 Segure o espaço para finalizar a prova com antecedência.
                 Aperte F para voltar a realizar a prova.
