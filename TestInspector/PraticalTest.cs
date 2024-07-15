@@ -145,18 +145,10 @@ class PraticalView(
                                 object output = default;
                                 lock (func)
                                 {
-                                    output = func(
-                                        test.Inputs
-                                            .Select(x => x is JsonElement el && 
-                                                el.TryGetInt32(out int value) ? value : x)
-                                            .Select(x => x is JsonElement el && 
-                                                el.TryGetSingle(out float value) ? value : x)
-                                            .Select(x => x is JsonElement el ? el.GetString() : x)
-                                            .ToArray()
-                                        );
+                                    output = func(InputAnalyzer.Analyze(test.Inputs));
                                 }
                                 Interlocked.Add(ref loading, 50 / testCount);
-                                if (!test.Hidden)
+                                // if (!test.Hidden)
                                     testInfo.AppendLine($"Saida: {output}.");
                                 
                                 if (output?.ToString() != test.Output.ToString())
@@ -170,6 +162,7 @@ class PraticalView(
                             }
                             catch (Exception ex)
                             {
+                                System.Windows.Forms.MessageBox.Show(ex.StackTrace);
                                 testInfo.AppendLine("O seguinte erro de execução foi encontrado:");
                                 testInfo.AppendLine(ex.Message);
                             }
