@@ -17,8 +17,8 @@ class PraticalView(
     Action<Input> oldUp) : View
 {
     Test test = results.Test;
-    Dictionary<PraticalTest, Dictionary<string, string>> docs = new();
-    Dictionary<PraticalTest, string> lastResult = new();
+    Dictionary<PraticalTest, Dictionary<string, string>> docs = [];
+    Dictionary<PraticalTest, string> lastResult = [];
     int current = 0;
     int page = 0;
     DateTime testFinal;
@@ -148,7 +148,7 @@ class PraticalView(
                                     output = func(InputAnalyzer.Analyze(test.Inputs));
                                 }
                                 Interlocked.Add(ref loading, 50 / testCount);
-                                // if (!test.Hidden)
+                                if (!test.Hidden)
                                     testInfo.AppendLine($"Saida: {output}.");
                                 
                                 if (output?.ToString() != test.Output.ToString())
