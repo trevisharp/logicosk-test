@@ -46,9 +46,10 @@ public static class InputAnalyzer
         var parts = code.Split(' ', StringSplitOptions.RemoveEmptyEntries)
             .Select(p => p.Trim())
             .ToArray();
+        if (parts[0] != "gen")
+            return [ code ];
         
         List<string> data = [];
-
         Dictionary<string, float> variables = [];
         for (int i = 0; i < parts.Length; i++)
         {

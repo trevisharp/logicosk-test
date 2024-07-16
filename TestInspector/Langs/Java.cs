@@ -55,7 +55,9 @@ public class Java : Language
             .Replace("Integer", "int")
             .Replace("Boolean", "bool")
             .Replace("boolean", "bool")
-            .Replace("length()", "Length")
+            .Replace("length", "Length")
+            .Replace("Length()", "Length")
+            .Replace("size()", "Count")
             ;
         
         var lines = code.Split('\n');
@@ -82,10 +84,15 @@ public class Java : Language
                 public static char charAt(this string str, int index)
                     => str[index];
                     
-                public static char substring(this string str, int i, int j)
+                public static string substring(this string str, int i, int j)
                     => str.Substring(i, j - i);
+                
+                public static bool contains(this string str, string other)
+                    => str.Contains(other);
             }
             """;
+        
+        System.Windows.Forms.MessageBox.Show(code);
 
         return code;
     }
