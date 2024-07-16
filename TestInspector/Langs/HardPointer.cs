@@ -1,14 +1,13 @@
 using System.Text;
 using System.Linq;
 using System.Collections.Generic;
-using System.Reflection;
 
-public class ExtendedBrainfuck : PseudoLanguage
+public class HardPointer : PseudoLanguage
 {
     public override Dictionary<string, string> Tutorial() => new(){
         { "Variávies",
             """
-            No ebf todas as variáveis são ponteiros que podem ser acessados e
+            No hp todas as variáveis são ponteiros que podem ser acessados e
             declarados usando a função goto:
             @
             main:
@@ -42,7 +41,7 @@ public class ExtendedBrainfuck : PseudoLanguage
         },
         { "Funções",
             """
-            Todo programa ebf precisa de uma função main! Declarando funções:
+            Todo programa hp precisa de uma função main! Declarando funções:
             @
             main:
                 // código aqui
@@ -180,7 +179,7 @@ public class ExtendedBrainfuck : PseudoLanguage
             }
 
             if (line.StartsWith(".")) {
-                code.AppendLine($"memory[pointer] = (int)inputs[inputIndex];");
+                code.AppendLine($"memory[pointer] = int.Parse(inputs[inputIndex].ToString());");
                 code.AppendLine($"inputIndex++;");
                 continue;
             }

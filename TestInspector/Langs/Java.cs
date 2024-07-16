@@ -91,8 +91,6 @@ public class Java : Language
                     => str.Contains(other);
             }
             """;
-        
-        System.Windows.Forms.MessageBox.Show(code);
 
         return code;
     }

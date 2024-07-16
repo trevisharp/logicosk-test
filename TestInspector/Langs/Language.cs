@@ -10,13 +10,14 @@ public abstract class Language
         {
             "py" => new Python(),
             "java" => new Java(),
-            "ebf" => new ExtendedBrainfuck(),
+            "hp" => new HardPointer(),
             "pjs" => new PseudoJavaScript(),
             _ => throw new NotImplementedException($"Not Implemented Language '{lang}'")
         };
 
     public abstract Dictionary<string, string> Tutorial();
     
+    // TODO: Change by Func<string[], string> to simplify
     public abstract Func<T, object> Compile<T>(string source, StringBuilder sb);
 
     public abstract Assembly CompileAssembly(string source, StringBuilder sb);
