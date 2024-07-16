@@ -53,7 +53,8 @@ public class Java : Language
             .Replace("String", "string")
             .Replace("Integer", "int")
             .Replace("Integer", "int")
-            .Replace("substring", "SubString")
+            .Replace("Boolean", "bool")
+            .Replace("boolean", "bool")
             .Replace("length()", "Length")
             ;
         
@@ -80,6 +81,9 @@ public class Java : Language
             {
                 public static char charAt(this string str, int index)
                     => str[index];
+                    
+                public static char substring(this string str, int i, int j)
+                    => str.Substring(i, j - i);
             }
             """;
 
