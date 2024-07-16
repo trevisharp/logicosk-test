@@ -9,6 +9,7 @@ public abstract class Language
         => lang switch
         {
             "py" => new Python(),
+            "java" => new Java(),
             "ebf" => new ExtendedBrainfuck(),
             "pjs" => new PseudoJavaScript(),
             _ => throw new NotImplementedException($"Not Implemented Language '{lang}'")
