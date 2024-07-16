@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
+// Consider converts to C#
 public class Python : RealLanguage
 {
     public override string BaseCode =>
