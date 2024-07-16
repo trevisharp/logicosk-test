@@ -7,7 +7,7 @@ public class exemple
         {
             for (int i = 0; i < item.length() - 1; i++)
             {
-                for (int j = i + 1; j < item.length(); j++)
+                for (int j = i + 1; j <= item.length(); j++)
                 {
                     var sub = item.substring(i, j);
                     boolean has = true;
