@@ -8,9 +8,9 @@ public class Java : Language
 {
     public override string BaseCode => 
         """
-        public class TestePratico
+        public class main
         {
-            RETURNTYPE function(PARAMETERS)
+            public static RETURNTYPE function(PARAMETERS)
             {
                 // Implementation here
             }
@@ -23,8 +23,8 @@ public class Java : Language
         if (assembly is null)
             return null;
         
-        var defaultType = assembly.GetType("TestePratico");
-        var mainCode = defaultType.GetMethod("main");
+        var defaultType = assembly.GetType("main");
+        var mainCode = defaultType.GetMethod("function");
         return x => mainCode.Invoke(null, [x]);
     }
 
@@ -54,17 +54,8 @@ public class Java : Language
             .Replace("Integer", "int")
             .Replace("Integer", "int")
             .Replace("substring", "SubString")
-            .Replace("length", "Length")
+            .Replace("length()", "Length")
             ;
-        
-        code +=
-            """
-            public static void JavaExtensions
-            {
-                public static char charAt(this string str, int index)
-                    => str[index];
-            }
-            """;
         
         var lines = code.Split('\n');
 
@@ -78,6 +69,19 @@ public class Java : Language
         }
 
         code = string.Join('\n', lines);
+        
+        code =
+            $$"""
+            int[] test = [ 1, 2, 3 ];
+
+            {{code}}
+
+            public static class JavaExtensions
+            {
+                public static char charAt(this string str, int index)
+                    => str[index];
+            }
+            """;
 
         return code;
     }
