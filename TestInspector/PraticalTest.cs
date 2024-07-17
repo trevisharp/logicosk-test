@@ -201,7 +201,7 @@ class PraticalView(
 
     protected override void OnRender(IGraphics g)
     {
-        g.Clear(Color.DarkGreen);
+        g.Clear(Color.LightSeaGreen);
         if (test is null)
             return;
         
@@ -242,7 +242,7 @@ class PraticalView(
             g.DrawText(
                 new Rectangle(5, 5, g.Width - 10, g.Height - 10),
                 font, StringAlignment.Near, StringAlignment.Near,
-                Brushes.LightCoral,
+                Brushes.Black,
                 $"""
                 Questão Prática {index + 1} / {test.PraticalTests.Count}: {pratical.Text}
                 
@@ -264,7 +264,7 @@ class PraticalView(
             g.DrawText(
                 new Rectangle(5, 5, g.Width / 3 - 10, g.Height - 10),
                 font, StringAlignment.Near, StringAlignment.Near,
-                Brushes.LightCoral, "Especificação da Lingugem:\n\n" +
+                Brushes.Black, "Especificação da Lingugem:\n\n" +
                     string.Join('\n', tutorial.Keys.Select((s, i) => 
                         i == pageIndex - 1 ? s.ToUpper() : s.ToLower()
                     )
@@ -286,7 +286,7 @@ class PraticalView(
                 );
                 g.DrawText(rect, font, 
                     StringAlignment.Near, StringAlignment.Near,
-                    code ? Brushes.LightYellow : Brushes.LightCoral, part
+                    code ? Brushes.DarkBlue : Brushes.Black, part
                 );
                 docLines += lines;
                 code = !code;
@@ -298,7 +298,7 @@ class PraticalView(
             g.DrawText(
                 new Rectangle(5, 5, g.Width / 2 - 5, g.Height - 10),
                 font, StringAlignment.Near, StringAlignment.Near,
-                Brushes.LightCoral,
+                Brushes.Black,
                 $"""
                 Melhor Nota Obtida: {100 * results.BestResults[pratical]}%
                 {(loading == -1 ? string.Empty : loading.ToString() + "%")}
@@ -310,7 +310,7 @@ class PraticalView(
             g.DrawText(
                 new Rectangle(g.Width / 2 + 5, 5, g.Width / 2 - 10, g.Height - 10),
                 font, StringAlignment.Near, StringAlignment.Near,
-                Brushes.LightCoral, lastResult[pratical]
+                Brushes.Black, lastResult[pratical]
             );
         }
 

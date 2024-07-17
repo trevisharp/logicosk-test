@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 public abstract class PseudoLanguage : Language
 {
@@ -17,7 +18,16 @@ public abstract class PseudoLanguage : Language
         
         var defaultType = assembly.GetType("TestePratico");
         var mainCode = defaultType.GetMethod("main");
-        return x => mainCode.Invoke(null, [x]);
+        return x =>
+        {
+            object output = null;
+            Task.WaitAny(
+                Task.Delay(500),
+                Task.Run(() => output = mainCode.Invoke(null, [x]))
+            );
+            
+            return output ?? "O código demorou muito para terminar de rodar.";
+        };
     }
 
     public override Assembly CompileAssembly(string source, StringBuilder sb)
