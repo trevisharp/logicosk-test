@@ -44,5 +44,19 @@ class FirstView(string path) : View
             StringAlignment.Center, StringAlignment.Center,
             "Aperte espaço para começar..."
         );
+
+        g.DrawText(
+            new Rectangle(5, g.Height / 2 + 50, g.Width - 10, g.Height / 2 - 80),
+            new Font("Arial", 20), 
+            StringAlignment.Center, StringAlignment.Center,
+            """
+            Use setas para navegar na prova e espaço para interagir.
+            Use Q, W, A e S se estiver com dificuldade de ler alguma parte do texto.
+            Use F para colocar a prova em modo 'aguradando...'.
+            Ao aguardar você pode esperar o tempo acabar e descansar, você
+            também pode começar a próxima etapa da prova antecipadamente.
+            Outras funcionalidades serão indicadas na prova.
+            """
+        );
     }
 }

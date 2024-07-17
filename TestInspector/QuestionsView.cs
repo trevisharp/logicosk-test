@@ -168,7 +168,7 @@ class QuestionsView(Results results, Action<Input> oldEvent) : View
         g.DrawText(
             new Rectangle(5, 5, g.Width - 10, g.Height - 10),
             font, StringAlignment.Near, StringAlignment.Near,
-            question.Text
+            $"{current + 1}) {question.Text}"
         );
         int y = 5 + jump * question.Text.Length / spacing;
 
