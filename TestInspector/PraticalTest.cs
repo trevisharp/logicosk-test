@@ -10,12 +10,9 @@ using System.Collections.Generic;
 using Pamella;
 using Logicosk;
 
-class PraticalView(
-    Results results,
-    Action<Input> oldDown, 
-    Action<Input> oldUp) : View
+class PraticalView(Action<Input> oldEv) : View
 {
-    Test test = results.Test;
+    Test test = Results.Current.Test;
     Dictionary<PraticalTest, Dictionary<string, string>> docs = [];
     Dictionary<PraticalTest, string> lastResult = [];
     int current = 0;
@@ -25,14 +22,13 @@ class PraticalView(
     int loading = -1;
     bool waitingEnd = false;
     DateTime waitingTime = DateTime.MaxValue;
-    DateTime spaceTime = DateTime.MaxValue;
-    Action<Input> ev;
+    DateTime fTime = DateTime.MaxValue;
+    Action<Input> oldKeydown;
+    private Action<Input> oldKeyUp;
 
     protected override void OnStart(IGraphics g)
     {
-        g.UnsubscribeKeyDownEvent(oldDown);
-        g.UnsubscribeKeyUpEvent(oldUp);
-
+        g.UnsubscribeKeyDownEvent(oldEv);
         AlwaysInvalidateMode();
 
         foreach (var pratical in test.PraticalTests)
@@ -40,14 +36,14 @@ class PraticalView(
             var file = $"main.{pratical.Language}";
             var lang = Language.New(pratical.Language);
             File.WriteAllText(file, lang.BaseCode);
-            results.BestResults.Add(pratical, 0f);
+            Results.Current.BestResults.Add(pratical, 0f);
             docs.Add(pratical, lang.Tutorial());
             lastResult.Add(pratical, "Nenhuma execução registrada...");
         }
 
         testFinal = DateTime.Now.AddMinutes(test.MinutesDuration);
 
-        g.SubscribeKeyDownEvent(ev = async key => {
+        g.SubscribeKeyDownEvent(oldKeydown = async key => {
             
             switch (key)
             {
@@ -74,14 +70,12 @@ class PraticalView(
 
 
                 case Input.F:
-                    if (waitingEnd)
-                    {
-                        var totalWaitingTime = DateTime.Now - waitingTime;
-                        if (totalWaitingTime.TotalMinutes > 3)
-                            break;
+                    if (fTime == DateTime.MaxValue) {
+                        fTime = DateTime.Now;
                     }
-                    waitingTime = DateTime.Now;
-                    waitingEnd = !waitingEnd;
+
+                    if (!waitingEnd)
+                        waitingEnd = true;
                     break;
                 
 
@@ -101,8 +95,8 @@ class PraticalView(
 
                 case Input.Space:
                     
-                    if (spaceTime == DateTime.MaxValue && waitingEnd)
-                        spaceTime = DateTime.Now;
+                    if (fTime == DateTime.MaxValue && waitingEnd)
+                        fTime = DateTime.Now;
 
                     if (loading != -1)
                         return;
@@ -181,27 +175,33 @@ class PraticalView(
                     lastResult[pratical] = runInfo.ToString();
 
                     float pontuation = corrects / (float)pratical.Tests.Count;
-                    if (results.BestResults[pratical] < pontuation)
-                        results.BestResults[pratical] = pontuation;
+                    if (Results.Current.BestResults[pratical] < pontuation)
+                        Results.Current.BestResults[pratical] = pontuation;
                     loading = -1;
                     break;
             }
         });
-    }
+        g.SubscribeKeyUpEvent(oldKeyUp = key => {
+            if (key == Input.F)
+            {
+                var time = DateTime.Now - fTime;
+                if (time.TotalSeconds > 2f)
+                {
+                    App.Clear();
+                    App.Push(new ThridView(oldKeyUp, oldKeydown));
+                    return;
+                }
 
-    protected override void OnFrame(IGraphics g)
-    {
-        var time = DateTime.Now - spaceTime;
-        if (time.TotalSeconds > 2f)
-        {
-            App.Clear();
-            App.Push(new DebugTest(results, ev));
-        }
+                waitingEnd = !waitingEnd;
+                fTime = DateTime.MaxValue;
+            }
+        });
     }
 
     protected override void OnRender(IGraphics g)
     {
         g.Clear(Color.LightSeaGreen);
+        var time = DateTime.Now - fTime;
         if (test is null)
             return;
         
@@ -211,17 +211,16 @@ class PraticalView(
                 new Rectangle(5, 5, g.Width - 10, g.Height - 10),
                 new Font("Arial", 140), 
                 StringAlignment.Center, StringAlignment.Center,
-                "Aguardando..."
+                "Finalizando..."
             );
             g.DrawText(
                 new Rectangle(5, g.Height - 200, g.Width - 10, 200),
                 new Font("Arial", 20), 
                 StringAlignment.Center, StringAlignment.Center,
+                time.TotalSeconds > 2f ? "Largue o botão F para avançar." :
                 """
-                Segure o espaço para finalizar a prova com antecedência.
-                Aperte F para voltar a realizar a prova.
-                Ficar mais de 3 minutos na tela de "aguardando..." impossibilitará você
-                de voltar a fazer a prova.
+                Continue segurando o botão F para finalizar a prova com antecedência.
+                Largue o botão F para voltar a realizar a prova.
                 """
             );
             timeCheck();
@@ -300,7 +299,7 @@ class PraticalView(
                 font, StringAlignment.Near, StringAlignment.Near,
                 Brushes.Black,
                 $"""
-                Melhor Nota Obtida: {100 * results.BestResults[pratical]}%
+                Melhor Nota Obtida: {100 * Results.Current.BestResults[pratical]}%
                 {(loading == -1 ? string.Empty : loading.ToString() + "%")}
                 
                 Edite o arquivo main.{pratical.Language} e pressione espaço para executar o código.
@@ -335,7 +334,7 @@ class PraticalView(
             if (DateTime.Now > testFinal)
             {
                 App.Pop();
-                App.Push(new DebugTest(results, ev));
+                App.Push(new ThridView(oldKeydown, oldKeyUp));
             }
         }
     }

@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using Pamella;
 using Logicosk;
 
-class QuestionsView(Results results, Action<Input> oldEvent) : View
+class QuestionsView(Action<Input> oldEvent) : View
 {
-    Test test = results.Test;
+    Test test = Results.Current.Test;
     Dictionary<string, Image> imgs = new Dictionary<string, Image>();
     int current = 0;
     int selected = 0;
@@ -15,9 +15,8 @@ class QuestionsView(Results results, Action<Input> oldEvent) : View
     bool waitingEnd = false;
     int jump = 80;
     int spacing = 60;
-    DateTime spaceTime = DateTime.MaxValue;
+    DateTime fTime = DateTime.MaxValue;
     DateTime testFinal;
-    DateTime waitingTime = DateTime.MaxValue;
     Action<Input> oldKeyEventDown = null;
     Action<Input> oldKeyEventUp = null;
     protected override void OnStart(IGraphics g)
@@ -70,14 +69,12 @@ class QuestionsView(Results results, Action<Input> oldEvent) : View
                     break;
 
                 case Input.F:
-                    if (waitingEnd)
-                    {
-                        var totalWaitingTime = DateTime.Now - waitingTime;
-                        if (totalWaitingTime.TotalMinutes > 3)
-                            break;
+                    if (fTime == DateTime.MaxValue) {
+                        fTime = DateTime.Now;
                     }
-                    waitingTime = DateTime.Now;
-                    waitingEnd = !waitingEnd;
+
+                    if (!waitingEnd)
+                        waitingEnd = true;
                     break;
 
                 case Input.W:
@@ -101,41 +98,39 @@ class QuestionsView(Results results, Action<Input> oldEvent) : View
 
 
                 case Input.Space:
-                    if (spaceTime == DateTime.MaxValue && waitingEnd)
-                        spaceTime = DateTime.Now;
-                    
                     if (waitingEnd)
                         return;
 
                     var question = test.Questions[current];
                     var awnser = question.Alternatives[selected];
 
-                    if (results.Answers.ContainsKey(question))
-                        results.Answers[question] = awnser;
-                    else results.Answers.Add(question, awnser);
+                    if (!Results.Current.Answers.TryAdd(question, awnser))
+                        Results.Current.Answers[question] = awnser;
                     break;
             }
 
         });
         g.SubscribeKeyUpEvent(oldKeyEventUp = key => {
-            if (key == Input.Space)
-                spaceTime = DateTime.MaxValue;
-        });
-    }
+            if (key == Input.F)
+            {
+                var time = DateTime.Now - fTime;
+                if (time.TotalSeconds > 2f)
+                {
+                    App.Clear();
+                    App.Push(new SecondView(oldKeyEventDown, oldKeyEventUp));
+                    return;
+                }
 
-    protected override void OnFrame(IGraphics g)
-    {
-        var time = DateTime.Now - spaceTime;
-        if (time.TotalSeconds > 2f)
-        {
-            App.Clear();
-            App.Push(new PraticalView(results, oldKeyEventDown, oldKeyEventUp));
-        }
+                waitingEnd = !waitingEnd;
+                fTime = DateTime.MaxValue;
+            }
+        });
     }
 
     protected override void OnRender(IGraphics g)
     {
         g.Clear(Color.SkyBlue);
+        var time = DateTime.Now - fTime;
         if (test is null)
             return;
         
@@ -145,17 +140,16 @@ class QuestionsView(Results results, Action<Input> oldEvent) : View
                 new Rectangle(5, 5, g.Width - 10, g.Height - 10),
                 new Font("Arial", 140), 
                 StringAlignment.Center, StringAlignment.Center,
-                "Aguardando..."
+                "Finalizando..."
             );
             g.DrawText(
                 new Rectangle(5, g.Height - 200, g.Width - 10, 200),
                 new Font("Arial", 20), 
                 StringAlignment.Center, StringAlignment.Center,
+                time.TotalSeconds > 2f ? "Largue o botão F para avançar." :
                 """
-                Segure o espaço para finalizar a prova com antecedência.
-                Aperte F para voltar a realizar a prova.
-                Ficar mais de 3 minutos na tela de "aguardando..." impossibilitará você
-                de voltar a fazer a prova.
+                Continue segurando o botão F para finalizar a prova com antecedência.
+                Largue o botão F para voltar a realizar a prova.
                 """
             );
             timeCheck();
@@ -198,7 +192,7 @@ class QuestionsView(Results results, Action<Input> oldEvent) : View
             if (selected == index)
                 g.FillRectangle(
                     5, y, g.Width - 10, jump * (text.Length / spacing + 1), Brushes.Black);
-            bool isAnswer = results.Answers.ContainsKey(question) && results.Answers[question] == alternative;
+            bool isAnswer = Results.Current.Answers.ContainsKey(question) && Results.Current.Answers[question] == alternative;
             g.DrawText(
                 new Rectangle(5, y, g.Width - 10, g.Height - y - 5),
                 font, StringAlignment.Near, StringAlignment.Near,
@@ -235,7 +229,7 @@ class QuestionsView(Results results, Action<Input> oldEvent) : View
             if (DateTime.Now > testFinal)
             {
                 App.Pop();
-                App.Open(new PraticalView(results, oldKeyEventDown, oldKeyEventUp));
+                App.Open(new SecondView(oldKeyEventDown, oldKeyEventUp));
             }
         }
     }

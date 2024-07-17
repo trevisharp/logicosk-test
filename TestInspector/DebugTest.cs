@@ -8,11 +8,10 @@ using Pamella;
 using Logicosk;
 
 public class DebugTest(
-    Results results,
     Action<Input> oldEvent
     ) : View
 {
-    Test test = results.Test;
+    Test test = Results.Current.Test;
     List<Lab> labs = [];
     List<Language> langs = [];
     List<string> files = [];
@@ -29,7 +28,7 @@ public class DebugTest(
     protected override void OnStart(IGraphics g)
     {
         level = 0;
-        results.LevelAvaliations = grades = new float[results.Test.BugfixTests.Count];
+        Results.Current.LevelAvaliations = grades = new float[Results.Current.Test.BugfixTests.Count];
         testFinal = DateTime.Now.Add(
             TimeSpan.FromMinutes(test.MinutesDuration)
         );
@@ -120,14 +119,14 @@ public class DebugTest(
         if (time.TotalSeconds > 2f && waitingEnd)
         {
             App.Pop();
-            App.Push(new ResultView(results, oldKeyEvent));
+            App.Push(new ResultView(oldKeyEvent));
         }
     }
 
     protected override void OnRender(IGraphics g)
     {
         g.Clear(Color.FromArgb(40, 10, 10));
-        if (results is null)
+        if (Results.Current is null)
             return;
         
         if (waitingEnd)
@@ -213,7 +212,7 @@ public class DebugTest(
             if (DateTime.Now > testFinal)
             {
                 App.Pop();
-                App.Push(new ResultView(results, oldKeyEvent));
+                App.Push(new ResultView(oldKeyEvent));
             }
         }
     }

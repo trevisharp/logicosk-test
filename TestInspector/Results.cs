@@ -4,6 +4,7 @@ using Logicosk;
 
 public class Results
 {
+    public static Results Current { get; set; }
     public Test Test { get; set; }
     public Dictionary<Question, Alternative> Answers { get; set; } = [];
     public Dictionary<PraticalTest, float> BestResults { get; set; } = [];

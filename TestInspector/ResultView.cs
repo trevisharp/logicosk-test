@@ -5,10 +5,10 @@ using System.Collections.Generic;
 
 using Pamella;
 
-public class ResultView(Results results, Action<Input> oldKeyEvent) : View
+public class ResultView(Action<Input> oldKeyEvent) : View
 {
     int desloc = 24;
-    Grade grade = results.GenerateGrade();
+    Grade grade = Results.Current.GenerateGrade();
     List<float> gradeAnimation = [ 0, 0, 0, 0, 0, 0, 0 ];
     List<float> maxGradeAnimation = [ 0, 0, 0, 0, 0, 0, 0 ];
     List<string> teoricalAspects = [
