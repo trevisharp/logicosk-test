@@ -20,9 +20,9 @@ public class DebugTest(
     bool helpView = false;
     bool waitingEnd = false;
     DateTime last = DateTime.Now;
-    DateTime waitingTime;
-    DateTime spaceTime = DateTime.MaxValue;
-    Action<Input> oldKeyEvent;
+    DateTime fTime = DateTime.MaxValue;
+    Action<Input> oldKeydown;
+    private Action<Input> oldKeyUp;
     private DateTime testFinal;
 
     protected override void OnStart(IGraphics g)
@@ -51,16 +51,12 @@ public class DebugTest(
 
         AlwaysInvalidateMode();
 
-        if (oldEvent is not null)
-            g.UnsubscribeKeyDownEvent(oldEvent);
-        g.SubscribeKeyDownEvent(oldKeyEvent = key =>
+        g.UnsubscribeKeyDownEvent(oldEvent);
+        g.SubscribeKeyDownEvent(oldKeydown = key =>
         {
             switch (key)
             {
                 case Input.Space:
-                    if (spaceTime == DateTime.MaxValue && waitingEnd)
-                        spaceTime = DateTime.Now;
-                    
                     if (waitingEnd)
                         return;
 
@@ -86,14 +82,12 @@ public class DebugTest(
                 
 
                 case Input.F:
-                    if (waitingEnd)
-                    {
-                        var totalWaitingTime = DateTime.Now - waitingTime;
-                        if (totalWaitingTime.TotalMinutes > 3)
-                            break;
+                    if (fTime == DateTime.MaxValue) {
+                        fTime = DateTime.Now;
                     }
-                    waitingTime = DateTime.Now;
-                    waitingEnd = !waitingEnd;
+
+                    if (!waitingEnd)
+                        waitingEnd = true;
                     break;
                 
 
@@ -111,21 +105,27 @@ public class DebugTest(
                     break;
             }
         });
-    }
+        g.SubscribeKeyUpEvent(oldKeyUp = key => {
+            if (key == Input.F)
+            {
+                var time = DateTime.Now - fTime;
+                if (time.TotalSeconds > 2f)
+                {
+                    App.Clear();
+                    App.Push(new ResultView(oldKeyUp, oldKeydown));
+                    return;
+                }
 
-    protected override void OnFrame(IGraphics g)
-    {
-        var time = DateTime.Now - spaceTime;
-        if (time.TotalSeconds > 2f && waitingEnd)
-        {
-            App.Pop();
-            App.Push(new ResultView(oldKeyEvent));
-        }
+                waitingEnd = !waitingEnd;
+                fTime = DateTime.MaxValue;
+            }
+        });
     }
 
     protected override void OnRender(IGraphics g)
     {
         g.Clear(Color.FromArgb(40, 10, 10));
+        var time = DateTime.Now - fTime;
         if (Results.Current is null)
             return;
         
@@ -135,18 +135,18 @@ public class DebugTest(
                 new Rectangle(5, 5, g.Width - 10, g.Height - 10),
                 new Font("Arial", 140), 
                 StringAlignment.Center, StringAlignment.Center,
-                Brushes.White, "Aguardando..."
+                Brushes.White,
+                "Finalizando..."
             );
             g.DrawText(
                 new Rectangle(5, g.Height - 200, g.Width - 10, 200),
                 new Font("Arial", 20), 
                 StringAlignment.Center, StringAlignment.Center,
                 Brushes.White,
+                time.TotalSeconds > 2f ? "Largue o botão F para avançar." :
                 """
-                Segure o espaço para finalizar a prova com antecedência.
-                Aperte F para voltar a realizar a prova.
-                Ficar mais de 3 minutos na tela de "aguardando..." impossibilitará você
-                de voltar a fazer a prova.
+                Continue segurando o botão F para finalizar a prova com antecedência.
+                Largue o botão F para voltar a realizar a prova.
                 """
             );
             timeCheck();
@@ -154,9 +154,9 @@ public class DebugTest(
         }
 
         var now = DateTime.Now;
-        var time = now - last;
+        var frameTime = now - last;
         last = now;
-        var dt = (float)time.TotalSeconds;
+        var dt = (float)frameTime.TotalSeconds;
 
         if (helpView)
         {
@@ -212,7 +212,7 @@ public class DebugTest(
             if (DateTime.Now > testFinal)
             {
                 App.Pop();
-                App.Push(new ResultView(oldKeyEvent));
+                App.Push(new ResultView(oldKeyUp, oldKeydown));
             }
         }
     }

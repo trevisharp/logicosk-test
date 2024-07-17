@@ -28,6 +28,8 @@ class SecondView(
 
     protected override void OnRender(IGraphics g)
     {
+        g.Clear(Color.WhiteSmoke);
+        
         g.DrawText(
             new Rectangle(5, 5, g.Width - 10, g.Height - 10),
             new Font("Arial", 140), 
