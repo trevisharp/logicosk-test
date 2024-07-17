@@ -124,7 +124,7 @@ public class DebugTest(
 
     protected override void OnRender(IGraphics g)
     {
-        g.Clear(Color.FromArgb(40, 10, 10));
+        g.Clear(Color.DarkBlue);
         var time = DateTime.Now - fTime;
         if (Results.Current is null)
             return;

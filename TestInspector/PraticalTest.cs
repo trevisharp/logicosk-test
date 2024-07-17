@@ -263,7 +263,7 @@ class PraticalView(Action<Input> oldEv) : View
             g.DrawText(
                 new Rectangle(5, 5, g.Width / 3 - 10, g.Height - 10),
                 font, StringAlignment.Near, StringAlignment.Near,
-                Brushes.Black, "Especificação da Lingugem:\n\n" +
+                Brushes.Black, $"Questão Prática {index + 1} / {test.PraticalTests.Count}: Especificação da Lingugem:\n\n" +
                     string.Join('\n', tutorial.Keys.Select((s, i) => 
                         i == pageIndex - 1 ? s.ToUpper() : s.ToLower()
                     )
@@ -299,6 +299,7 @@ class PraticalView(Action<Input> oldEv) : View
                 font, StringAlignment.Near, StringAlignment.Near,
                 Brushes.Black,
                 $"""
+                Questão Prática {index + 1} / {test.PraticalTests.Count}:
                 Melhor Nota Obtida: {100 * Results.Current.BestResults[pratical]}%
                 {(loading == -1 ? string.Empty : loading.ToString() + "%")}
                 

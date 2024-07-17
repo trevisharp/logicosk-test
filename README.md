@@ -30,7 +30,7 @@ Test of logic and computational skills questions repository.
 
 ## Grade
 
-Final grade = 0.49 * S1 + 0.3 * S2 + 0.s1 * S3
+Final grade = 0.49 * S1 + 0.3 * S2 + 0.21 * S3
 
 ## Classification
 

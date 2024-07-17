@@ -5,8 +5,9 @@ using Logicosk;
 using Pamella;
 
 class ThridView(
-    Action<Input> oldDown, 
-    Action<Input> oldUp) : View
+    Action<Input> oldUp,
+    Action<Input> oldDown 
+    ) : View
 {
     protected override void OnStart(IGraphics g)
     {
@@ -30,7 +31,7 @@ class ThridView(
     protected override void OnRender(IGraphics g)
     {
         g.Clear(Color.WhiteSmoke);
-        
+
         g.DrawText(
             new Rectangle(5, 5, g.Width - 10, g.Height - 10),
             new Font("Arial", 140), 
