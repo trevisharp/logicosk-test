@@ -69,13 +69,16 @@ public class Planetary : Lab
         foreach (var (p, q) in pairs)
         {
             float distance = dist(p.X, p.Y, q.X, q.Y);
+            if (distance == 0)
+                continue;
+
             const float G = 6.6743e-11f; // m3 kg-1 s-2;
             float force = G * p.Mass * q.Mass / (distance * distance);
             
             float dx = p.X - q.X;
             float dy = p.Y - q.Y; 
-            dx /= distance + 1f;
-            dy /= distance + 1f;
+            dx /= distance;
+            dy /= distance;
 
             q.VelX += dx * force / q.Mass * dt;
             q.VelY += dy * force / q.Mass * dt;

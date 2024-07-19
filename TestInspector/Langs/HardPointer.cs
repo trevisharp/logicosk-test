@@ -20,7 +20,8 @@ public class HardPointer : PseudoLanguage
                 goto myVar
                 8 // agora myVar vale 8
                 goto myOtherVar
-                myVar // agora myOtherVar vale 8 também
+                myVar // copia valor da myVar para myOtherVar
+                12 // myOtherVar agora vale 12 mas myVar continua valendo 8
             @
             """
         },
@@ -111,18 +112,22 @@ public class HardPointer : PseudoLanguage
             Você pode fazer um 'if' utilizando deste artefato:
             @
             add:
+            goto a
             .
-            goto other
+            goto b
             .
             ![
-                exit // se other é zero, retorna
+                exit // se b é zero, retorna
             ]
             [
+                goto b
                 -
-                goto result
+                goto a
                 +
-                goto other
+                goto b
             ]
+            goto result
+            a
             exit
             @
             """

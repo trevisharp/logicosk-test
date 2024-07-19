@@ -235,6 +235,15 @@ class PraticalView(Action<Input> oldEv) : View
         while (page < 0)
             page += totalPages;
         int pageIndex = page % totalPages;
+
+        g.DrawText(
+            new Rectangle(5, g.Height - 55, 150, 60),
+            new Font("Arial", 20),
+            StringAlignment.Center, StringAlignment.Center,
+            Brushes.Black,
+            $"↕ ({pageIndex + 1} / {totalPages})"
+        );
+
         if (pageIndex == 0)
         {
             var font = new Font("Arial", 40);
@@ -301,7 +310,7 @@ class PraticalView(Action<Input> oldEv) : View
                 $"""
                 Questão Prática {index + 1} / {test.PraticalTests.Count}:
                 Melhor Nota Obtida: {100 * Results.Current.BestResults[pratical]}%
-                {(loading == -1 ? string.Empty : loading.ToString() + "%")}
+                {(loading == -1 ? "" : $"Rodando: {loading}%")}
                 
                 Edite o arquivo main.{pratical.Language} e pressione espaço para executar o código.
                 """

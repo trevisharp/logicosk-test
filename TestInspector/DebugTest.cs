@@ -16,6 +16,7 @@ public class DebugTest(
     List<Language> langs = [];
     List<string> files = [];
     float[] grades;
+    float[] lastgrades;
     int level;
     bool helpView = false;
     bool waitingEnd = false;
@@ -29,6 +30,7 @@ public class DebugTest(
     {
         level = 0;
         Results.Current.LevelAvaliations = grades = new float[Results.Current.Test.BugfixTests.Count];
+        lastgrades = new float[Results.Current.Test.BugfixTests.Count];
         testFinal = DateTime.Now.Add(
             TimeSpan.FromMinutes(test.MinutesDuration)
         );
@@ -70,9 +72,9 @@ public class DebugTest(
                     var type = assembly.GetType("TestePratico");
                     labs[level].Reset();
                     labs[level].LoadBehaviour(type);
-                    var grade = labs[level].Avaliate();
-                    if (grade > grades[level])
-                        grades[level] = grade;
+                    lastgrades[level] = labs[level].Avaliate();
+                    if (lastgrades[level] > grades[level])
+                        grades[level] = lastgrades[level];
                     break;
                 
 
@@ -181,7 +183,10 @@ public class DebugTest(
             new RectangleF(0, 0, 200, 40), 
             new Font("Arial", 16),
             Brushes.White, 
-            $"Melhor Nota: {100 * grades[level]}"
+            $"""
+            Melhor Nota: {100 * grades[level]}
+            Última Nota: {100 * lastgrades[level]}
+            """
         );
 
         g.DrawText(

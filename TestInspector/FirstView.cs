@@ -55,9 +55,7 @@ class FirstView(string path) : View
             """
             Use setas para navegar na prova e espaço para interagir.
             Use Q, W, A e S se estiver com dificuldade de ler alguma parte do texto.
-            Use F para colocar a prova em modo 'aguradando...'.
-            Ao aguardar você pode esperar o tempo acabar e descansar, você
-            também pode começar a próxima etapa da prova antecipadamente.
+            Segure o F para finalizar a prova antecipadamente.
             Outras funcionalidades serão indicadas na prova.
             """
         );
