@@ -17,7 +17,7 @@ public class Results
             foreach (var aspect in pair.Key.Aspects)
             {
                 int index = 2 * (aspect - 1);
-                aspects[index] += pair.Value.Correctness;
+                aspects[index] += pair.Value?.Correctness ?? 0f;
                 aspects[index + 1] += 1f;
             }
         }

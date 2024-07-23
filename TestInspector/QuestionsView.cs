@@ -26,6 +26,9 @@ class QuestionsView(Action<Input> oldEvent) : View
             TimeSpan.FromMinutes(test.MinutesDuration)
         );
 
+        foreach (var q in test.Questions)
+            Results.Current.Answers.Add(q, null);
+
         AlwaysInvalidateMode();
         g.SubscribeKeyDownEvent(oldKeyEventDown = key => {
 
