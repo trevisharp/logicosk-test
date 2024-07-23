@@ -9,6 +9,7 @@ public abstract class Lab
         name switch
         {
             "planetary" => new Planetary(),
+            "validator" => new Validator(),
             _ => throw new NotImplementedException($"unknown lab '{name}'.")
         };
 
