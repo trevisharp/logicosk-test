@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 using Pamella;
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
 
 public class Planetary : Lab
 {
@@ -55,17 +56,6 @@ public class Planetary : Lab
         return MathF.Sqrt(mod);
     };
 
-    bool customPair = false;
-    Func<dynamic, dynamic> pair = (planets) =>
-    {
-        List<Planet> list = (List<Planet>)planets;
-        return 
-            from p in list
-            from q in list
-            where p != q
-            select (p, q);
-    };
-
     public override void Interact(float dt)
     {
         try
@@ -73,11 +63,12 @@ public class Planetary : Lab
             if (dist is null)
                 return;
             
-            if (pair is null)
-                return;
-            
             dt *= speed;
-            IEnumerable<(Planet p, Planet q)> pairs = pair(planets);
+            var pairs = 
+                from p in planets
+                from q in planets
+                where p != q
+                select (p, q);
 
             foreach (var (p, q) in pairs)
             {
@@ -103,10 +94,7 @@ public class Planetary : Lab
                 planet.Y += planet.VelY * dt;
             }
         }
-        catch (Exception ex)
-        {
-            MessageBox.Show(ex.Message);
-        }
+        catch { }
     }
 
     public override void Draw(IGraphics g)
@@ -148,10 +136,6 @@ public class Planetary : Lab
         var method = code.GetMethod("dist");
         if (customDist && method is not null)
             dist = (xp, yp, xq, yq) => method.Invoke(null, [xp, yp, xq, yq]);
-                
-        var method2 = code.GetMethod("pair");
-        if (customPair && method2 is not null)
-            pair = planets => method2.Invoke(null, [ planets ]);
     }
 
     Planet earth(float x0, float y0, float vx0, float vy0)
@@ -207,6 +191,40 @@ public class Planetary : Lab
         assert(dist(20, 36, 120, 80), result, ref points);
 
         return points / 16;
+    }
+
+    void assert<T>(List<T> listA, List<T> listB, ref float points)
+    {
+        if (listA is null || listB is null)
+            return;
+        
+        float pts = 0;
+        foreach (var item in listA)
+        {
+            bool has = false;
+            foreach (var other in listB)
+            {
+                if (item.Equals(other))
+                {
+                    if (has)
+                    {
+                        has = false;
+                        break;
+                    }
+
+                    has = true;
+                }
+            }
+            if (has)
+                pts++;
+        }
+        if (listB.Count == 0)
+        {
+            if (pts == 0)
+                points += 1f;
+            return;
+        }
+        points += pts / listB.Count;
     }
 
     void assert(float expected, float result, ref float points)

@@ -58,7 +58,7 @@ public class PseudoJavaScript : PseudoLanguage
             code.Append(
                 line
                     .Replace("sqrt", "Sqrt")
-                    .Replace("length", "Length")
+                    .Replace("length", "Count")
                     .Replace("push", "Add")
                     .Replace("[]", "new List<dynamic>()")
                     .Replace("Math", "MathF")
@@ -75,8 +75,6 @@ public class PseudoJavaScript : PseudoLanguage
         }
 
         code.AppendLine("}");
-
-        System.Windows.Forms.MessageBox.Show(code.ToString());
 
         return code.ToString();
     }
