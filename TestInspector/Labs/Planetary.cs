@@ -4,8 +4,6 @@ using System.Drawing;
 using System.Collections.Generic;
 
 using Pamella;
-using System.Windows.Forms;
-using System.Runtime.InteropServices;
 
 public class Planetary : Lab
 {
@@ -135,7 +133,14 @@ public class Planetary : Lab
     {
         var method = code.GetMethod("dist");
         if (customDist && method is not null)
-            dist = (xp, yp, xq, yq) => method.Invoke(null, [xp, yp, xq, yq]);
+            dist = (xp, yp, xq, yq) =>
+            {
+                try
+                {
+                    return method.Invoke(null, [xp, yp, xq, yq]);
+                }
+                catch { return 0; }
+            };
     }
 
     Planet earth(float x0, float y0, float vx0, float vy0)

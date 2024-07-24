@@ -14,6 +14,7 @@ public class Validator : Lab
         string numeric = string.Concat(alphaNumeric.Where(c => c >= '0' && c <= '9'));
         return long.Parse(numeric);
     };
+
     bool customValidate = false;
     Func<dynamic, dynamic> validate = input =>
     {
@@ -48,6 +49,7 @@ public class Validator : Lab
 
         return cpf / mod % 10 == digit;
     };
+    
     public override float Avaliate()
     {
         throw new NotImplementedException();
