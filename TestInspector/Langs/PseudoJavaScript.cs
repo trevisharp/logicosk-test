@@ -49,16 +49,34 @@ public class PseudoJavaScript : PseudoLanguage
                 continue;
             }
 
+            if (line == "{")
+            {
+                code.AppendLine("{");
+                continue;
+            }
+
             code.Append(
                 line
                     .Replace("sqrt", "Sqrt")
+                    .Replace("length", "Length")
+                    .Replace("push", "Add")
+                    .Replace("[]", "new List<dynamic>()")
                     .Replace("Math", "MathF")
                     .Replace("let", "var")
             );
+
+            if (line.StartsWith("for"))
+                continue;
+
+            if (line.StartsWith("if"))
+                continue;
+            
             code.AppendLine(";");
         }
 
         code.AppendLine("}");
+
+        System.Windows.Forms.MessageBox.Show(code.ToString());
 
         return code.ToString();
     }

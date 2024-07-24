@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Collections.Generic;
 
 using Pamella;
+using System.Windows.Forms;
 
 public class Planetary : Lab
 {
@@ -54,40 +55,57 @@ public class Planetary : Lab
         return MathF.Sqrt(mod);
     };
 
-    public override void Interact(float dt)
+    bool customPair = false;
+    Func<dynamic, dynamic> pair = (planets) =>
     {
-        if (dist is null)
-            return;
-        
-        dt *= speed;
-        var pairs = 
-            from p in planets
-            from q in planets
+        List<Planet> list = (List<Planet>)planets;
+        return 
+            from p in list
+            from q in list
             where p != q
             select (p, q);
+    };
 
-        foreach (var (p, q) in pairs)
+    public override void Interact(float dt)
+    {
+        try
         {
-            float distance = dist(p.X, p.Y, q.X, q.Y);
-            if (distance == 0)
-                continue;
-
-            const float G = 6.6743e-11f; // m3 kg-1 s-2;
-            float force = G * p.Mass * q.Mass / (distance * distance);
+            if (dist is null)
+                return;
             
-            float dx = p.X - q.X;
-            float dy = p.Y - q.Y; 
-            dx /= distance;
-            dy /= distance;
+            if (pair is null)
+                return;
+            
+            dt *= speed;
+            IEnumerable<(Planet p, Planet q)> pairs = pair(planets);
 
-            q.VelX += dx * force / q.Mass * dt;
-            q.VelY += dy * force / q.Mass * dt;
+            foreach (var (p, q) in pairs)
+            {
+                float distance = dist(p.X, p.Y, q.X, q.Y);
+                if (distance == 0)
+                    continue;
+
+                const float G = 6.6743e-11f; // m3 kg-1 s-2;
+                float force = G * p.Mass * q.Mass / (distance * distance);
+                
+                float dx = p.X - q.X;
+                float dy = p.Y - q.Y; 
+                dx /= distance;
+                dy /= distance;
+
+                q.VelX += dx * force / q.Mass * dt;
+                q.VelY += dy * force / q.Mass * dt;
+            }
+
+            foreach (var planet in planets)
+            {
+                planet.X += planet.VelX * dt;
+                planet.Y += planet.VelY * dt;
+            }
         }
-
-        foreach (var planet in planets)
+        catch (Exception ex)
         {
-            planet.X += planet.VelX * dt;
-            planet.Y += planet.VelY * dt;
+            MessageBox.Show(ex.Message);
         }
     }
 
@@ -129,8 +147,11 @@ public class Planetary : Lab
     {
         var method = code.GetMethod("dist");
         if (customDist && method is not null)
-            dist = (xp, yp, xq, yq) =>
-                method.Invoke(null, [xp, yp, xq, yq]);
+            dist = (xp, yp, xq, yq) => method.Invoke(null, [xp, yp, xq, yq]);
+                
+        var method2 = code.GetMethod("pair");
+        if (customPair && method2 is not null)
+            pair = planets => method2.Invoke(null, [ planets ]);
     }
 
     Planet earth(float x0, float y0, float vx0, float vy0)
