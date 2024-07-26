@@ -32,7 +32,7 @@ public class DebugTest(
         Results.Current.LevelAvaliations = grades = new float[Results.Current.Test.BugfixTests.Count];
         lastgrades = new float[Results.Current.Test.BugfixTests.Count];
         testFinal = DateTime.Now.Add(
-            TimeSpan.FromMinutes(test.MinutesDuration)
+            TimeSpan.FromMinutes(30)
         );
 
         int index = 0;
@@ -209,7 +209,7 @@ public class DebugTest(
                     <= 15 and > 5 => Brushes.Yellow,
                     <= 5 and > 1 => Brushes.Orange,
                     <= 1 => Brushes.Red,
-                    _ => Brushes.Black
+                    _ => Brushes.White
                 },
                 $"{remainingTime.Hours:00}:{remainingTime.Minutes:00}:{remainingTime.Seconds:00}"
             );
