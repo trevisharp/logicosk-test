@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
+
 using Pamella;
 
 public abstract class Lab
@@ -10,6 +10,7 @@ public abstract class Lab
         {
             "planetary" => new Planetary(),
             "validator" => new Validator(),
+            "calculator" => new Calculator(),
             _ => throw new NotImplementedException($"unknown lab '{name}'.")
         };
 
